@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c2f804db14cfb84d840ff99794df2f1, type: 3}
+  m_Name: PlayerConfig 1
+  m_EditorClassIdentifier: Assembly-CSharp::Player.Config.PlayerConfig
+  NetworkMode: 0
+  UseNetworking: 0
+  MovementType: 0
+  WalkSpeed: 5
+  RunSpeed: 9
+  CrouchSpeed: 2.5
+  Acceleration: 15
+  Deceleration: 20
+  AirControl: 0.3
+  JumpForce: 7
+  Gravity: 20
+  FallMultiplier: 2
+  MaxJumps: 1
+  CoyoteTime: 0.1
+  JumpBuffer: 0.15
+  CanCrouch: 1
+  CrouchHeight: 1
+  StandHeight: 2
+  CameraMode: 0
+  MouseSensitivityX: 2
+  MouseSensitivityY: 2
+  CameraSmoothing: 0
+  PitchClampUp: 80
+  PitchClampDown: 80
+  ThirdPersonDistance: 4
+  InvertY: 0
+  MaxHealth: 100
+  HealthRegenEnabled: 0
+  HealthRegenRate: 5
+  HealthRegenDelay: 3
+  InvincibilityDuration: 0
+  RespawnDelay: 3
+  AllowRespawn: 1
+  ResetHealthOnRespawn: 1
