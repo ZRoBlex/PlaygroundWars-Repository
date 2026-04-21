@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 73693579}
   - component: {fileID: 73693578}
   - component: {fileID: 73693577}
+  - component: {fileID: 73693582}
   m_Layer: 0
   m_Name: Flag B
   m_TagString: Untagged
@@ -151,11 +152,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 604da29aebad34b41b2ec95b1791306f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameMode.CTF.FlagController
-  _config: {fileID: 11400000, guid: 68a0c2bb594d2ed49b1452e9328e0615, type: 2}
+  _config: {fileID: 0}
   _ownerTeamID: 1
   _flagMesh: {fileID: 6582258449145420298, guid: 128c9847f5376744f975e77b24ac635f, type: 3}
   _baseIndicator: {fileID: 2051966644}
   _flagRenderer: {fileID: 73693579}
+  <State>k__BackingField: 0
+  <CarrierID>k__BackingField: -1
+  _basePos: {x: 0, y: 0, z: 0}
+  _baseRot: {x: 0, y: 0, z: 0, w: 0}
+  _carrierTransform: {fileID: 0}
 --- !u!65 &73693578
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -249,6 +255,77 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &73693582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 73693576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14b0cd4a589437a49b0181810356bf4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameMode.CTF.FlagController
+  _config: {fileID: 11400000, guid: 68a0c2bb594d2ed49b1452e9328e0615, type: 2}
+  _ownerTeamID: 1
+  _flagMesh: {fileID: 6582258449145420298, guid: 128c9847f5376744f975e77b24ac635f, type: 3}
+  _baseIndicator: {fileID: 7368270779369854232, guid: 27f65645c9d7f4542b844d0a50f73e43, type: 3}
+  _flagRenderer: {fileID: 73693579}
+--- !u!1 &120403556
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 120403557}
+  - component: {fileID: 120403558}
+  m_Layer: 0
+  m_Name: 'GameSystems '
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &120403557
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120403556}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 314480611}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &120403558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120403556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 913bf23599734fd458d02cd87856683e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameMode.CTF.CaptureTheFlagMode
+  _gameModeID: CTF
+  _displayName: Capture The Flag
+  <Phase>k__BackingField: 0
+  <IsRunning>k__BackingField: 0
+  <ElapsedTime>k__BackingField: 0
+  _config: {fileID: 0}
+  _flags:
+  - {fileID: 1758633460}
+  - {fileID: 73693577}
+  _captureLogic: {fileID: 2024535811}
 --- !u!1 &249680853
 GameObject:
   m_ObjectHideFlags: 0
@@ -309,7 +386,7 @@ Transform:
   m_GameObject: {fileID: 263481211}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -344,11 +421,15 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1662586899}
-  - {fileID: 1039651332}
   - {fileID: 1713888638}
   - {fileID: 1415297127}
+  - {fileID: 529405777}
+  - {fileID: 2051966648}
   - {fileID: 524924944}
+  - {fileID: 2024535810}
+  - {fileID: 120403557}
+  - {fileID: 1662586899}
+  - {fileID: 1039651332}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &365876058
@@ -2519,6 +2600,8 @@ GameObject:
   - component: {fileID: 529405775}
   - component: {fileID: 529405774}
   - component: {fileID: 529405778}
+  - component: {fileID: 529405780}
+  - component: {fileID: 529405779}
   m_Layer: 0
   m_Name: Zone A
   m_TagString: Untagged
@@ -2617,7 +2700,7 @@ Transform:
   m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1415297127}
+  m_Father: {fileID: 314480611}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &529405778
 MonoBehaviour:
@@ -2631,9 +2714,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1797300f8799bba4b93815a1919612ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameMode.CTF.CaptureZone
-  _config: {fileID: 11400000, guid: 68a0c2bb594d2ed49b1452e9328e0615, type: 2}
+  _config: {fileID: 0}
   _teamID: 0
   _zoneRenderer: {fileID: 529405775}
+--- !u!114 &529405779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 529405773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 578029aa14dd0174e9ca697eede1cff5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameMode.CTF.FlagBase
+  _config: {fileID: 11400000, guid: 68a0c2bb594d2ed49b1452e9328e0615, type: 2}
+  _teamID: 0
+  _flag: {fileID: 1758633465}
+  _baseRenderer: {fileID: 529405775}
+--- !u!114 &529405780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 529405773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4443e951025c46f4bb29cf8aaa9faf65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameMode.CTF.CaptureZone
+  _config: {fileID: 11400000, guid: 68a0c2bb594d2ed49b1452e9328e0615, type: 2}
+  _teamID: 0
+  _zoneRenderer: {fileID: 0}
 --- !u!1 &543869326
 GameObject:
   m_ObjectHideFlags: 0
@@ -3334,7 +3448,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4296853204132145854, guid: 8069cce1113bcfe40b194cd1782a4e64, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1662586901}
   m_SourcePrefab: {fileID: 100100000, guid: 8069cce1113bcfe40b194cd1782a4e64, type: 3}
 --- !u!43 &1268642877
 Mesh:
@@ -3751,9 +3868,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 529405777}
-  - {fileID: 2051966648}
+  m_Children: []
   m_Father: {fileID: 314480611}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1611145144
@@ -3806,11 +3921,31 @@ MonoBehaviour:
   _muzzlePoint: {fileID: 2034326469}
   _muzzleFlashPrefab: {fileID: 0}
   _muzzleFlashDuration: 0.05
+--- !u!1 &1662586897 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4296853204132145854, guid: 8069cce1113bcfe40b194cd1782a4e64, type: 3}
+  m_PrefabInstance: {fileID: 1112495548}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1662586899 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9092940352896758116, guid: 8069cce1113bcfe40b194cd1782a4e64, type: 3}
   m_PrefabInstance: {fileID: 1112495548}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1662586901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1662586897}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d72e39660186654e8b45f2fb7612901, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ServerDamageProcessor
+  _isAuthority: 1
+  _maxDamagePerShot: 500
+  _maxRangeBonus: 10
 --- !u!4 &1693219965 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2510586334331768591, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
@@ -3825,7 +3960,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1713888638}
-  - component: {fileID: 1713888636}
+  - component: {fileID: 1713888639}
+  - component: {fileID: 1713888641}
+  - component: {fileID: 1713888642}
   m_Layer: 0
   m_Name: '[GameMode]'
   m_TagString: Untagged
@@ -3833,25 +3970,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1713888636
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1713888635}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 913bf23599734fd458d02cd87856683e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameMode.CTF.CaptureTheFlagMode
-  _gameModeID: CTF
-  _displayName: Capture The Flag
-  _config: {fileID: 11400000, guid: 68a0c2bb594d2ed49b1452e9328e0615, type: 2}
-  _flags:
-  - {fileID: 1758633460}
-  - {fileID: 73693577}
-  _captureLogic: {fileID: 2024535811}
 --- !u!4 &1713888638
 Transform:
   m_ObjectHideFlags: 0
@@ -3864,10 +3982,57 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 2024535810}
+  m_Children: []
   m_Father: {fileID: 314480611}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1713888639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1713888635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae3f3d5fe0590184cbecc52f4129f7fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameMode.GameModeManager
+  _defaultMode: {fileID: 120403558}
+  <CurrentMode>k__BackingField: {fileID: 0}
+--- !u!114 &1713888641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1713888635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17282a59a8d8dc742843321f1318f1f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameMode.CTF.CaptureTheFlagMode
+  _gameModeID: Base
+  _displayName: Game Mode
+  _config: {fileID: 11400000, guid: 68a0c2bb594d2ed49b1452e9328e0615, type: 2}
+  _flags:
+  - {fileID: 1758633465}
+  - {fileID: 73693582}
+  _captureLogic: {fileID: 2024535812}
+--- !u!114 &1713888642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1713888635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d72e39660186654e8b45f2fb7612901, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ServerDamageProcessor
+  _isAuthority: 1
+  _maxDamagePerShot: 500
+  _maxRangeBonus: 10
 --- !u!1 &1721902428
 GameObject:
   m_ObjectHideFlags: 0
@@ -3914,6 +4079,7 @@ GameObject:
   - component: {fileID: 1758633462}
   - component: {fileID: 1758633461}
   - component: {fileID: 1758633460}
+  - component: {fileID: 1758633465}
   m_Layer: 0
   m_Name: Flag A
   m_TagString: Untagged
@@ -3933,11 +4099,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 604da29aebad34b41b2ec95b1791306f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameMode.CTF.FlagController
-  _config: {fileID: 11400000, guid: 68a0c2bb594d2ed49b1452e9328e0615, type: 2}
+  _config: {fileID: 0}
   _ownerTeamID: 0
   _flagMesh: {fileID: 6582258449145420298, guid: 128c9847f5376744f975e77b24ac635f, type: 3}
   _baseIndicator: {fileID: 529405773}
   _flagRenderer: {fileID: 1758633462}
+  <State>k__BackingField: 0
+  <CarrierID>k__BackingField: -1
+  _basePos: {x: 0, y: 0, z: 0}
+  _baseRot: {x: 0, y: 0, z: 0, w: 0}
+  _carrierTransform: {fileID: 0}
 --- !u!65 &1758633461
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4031,6 +4202,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1758633465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1758633459}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14b0cd4a589437a49b0181810356bf4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameMode.CTF.FlagController
+  _config: {fileID: 11400000, guid: 68a0c2bb594d2ed49b1452e9328e0615, type: 2}
+  _ownerTeamID: 0
+  _flagMesh: {fileID: 6582258449145420298, guid: 128c9847f5376744f975e77b24ac635f, type: 3}
+  _baseIndicator: {fileID: 7368270779369854232, guid: 27f65645c9d7f4542b844d0a50f73e43, type: 3}
+  _flagRenderer: {fileID: 1758633462}
 --- !u!4 &1862889485 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5569780154333297299, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
@@ -4167,6 +4355,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2024535810}
   - component: {fileID: 2024535811}
+  - component: {fileID: 2024535812}
   m_Layer: 0
   m_Name: GameLogic
   m_TagString: Untagged
@@ -4187,7 +4376,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1713888638}
+  m_Father: {fileID: 314480611}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2024535811
 MonoBehaviour:
@@ -4199,6 +4388,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1baa0645166f8b418b96486e38022b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameMode.CTF.CaptureLogicSystem
+  _config: {fileID: 0}
+  _isAuthority: 1
+--- !u!114 &2024535812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2024535809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0afc6ea52dbc3b34dbcbbc98b2ec61a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameMode.CTF.CaptureLogicSystem
   _config: {fileID: 11400000, guid: 68a0c2bb594d2ed49b1452e9328e0615, type: 2}
@@ -4247,6 +4450,8 @@ GameObject:
   - component: {fileID: 2051966646}
   - component: {fileID: 2051966645}
   - component: {fileID: 2051966649}
+  - component: {fileID: 2051966651}
+  - component: {fileID: 2051966650}
   m_Layer: 0
   m_Name: Zone B
   m_TagString: Untagged
@@ -4345,7 +4550,7 @@ Transform:
   m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1415297127}
+  m_Father: {fileID: 314480611}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2051966649
 MonoBehaviour:
@@ -4359,9 +4564,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1797300f8799bba4b93815a1919612ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameMode.CTF.CaptureZone
-  _config: {fileID: 11400000, guid: 68a0c2bb594d2ed49b1452e9328e0615, type: 2}
+  _config: {fileID: 0}
   _teamID: 1
   _zoneRenderer: {fileID: 2051966646}
+--- !u!114 &2051966650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2051966644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 578029aa14dd0174e9ca697eede1cff5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameMode.CTF.FlagBase
+  _config: {fileID: 11400000, guid: 68a0c2bb594d2ed49b1452e9328e0615, type: 2}
+  _teamID: 1
+  _flag: {fileID: 73693582}
+  _baseRenderer: {fileID: 2051966646}
+--- !u!114 &2051966651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2051966644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4443e951025c46f4bb29cf8aaa9faf65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameMode.CTF.CaptureZone
+  _config: {fileID: 11400000, guid: 68a0c2bb594d2ed49b1452e9328e0615, type: 2}
+  _teamID: 1
+  _zoneRenderer: {fileID: 0}
 --- !u!1 &2143961167
 GameObject:
   m_ObjectHideFlags: 0
@@ -4435,6 +4671,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
       propertyPath: m_Name
+      value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
+      propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 5569780154333297299, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
@@ -4538,8 +4778,8 @@ PrefabInstance:
       addedObject: {fileID: 945119754}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
-      insertIndex: 4
-      addedObject: {fileID: 3973712536309430584}
+      insertIndex: 2
+      addedObject: {fileID: 3973712536309430590}
     - targetCorrespondingSourceObject: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3973712536309430575}
@@ -4561,6 +4801,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3973712536309430586}
+    - targetCorrespondingSourceObject: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3973712536309430591}
   m_SourcePrefab: {fileID: 100100000, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
 --- !u!143 &3973712536309430572 stripped
 CharacterController:
@@ -4600,32 +4843,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99f6e9b62422cae4ea70b8af2bee7b92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Combat.Systems.ShootingSystem
---- !u!114 &3973712536309430584
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3973712536309430573}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c14543bd4d506b45a05ea80ce448560, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Player.Movement.PlayerMovement_Fixed
-  _config: {fileID: 11400000, guid: d1110e6e815f38049b375b7f80d63d6b, type: 2}
-  _groundCheckOrigin: {fileID: 2143961168}
-  _groundCheckRadius: 0.25
-  _groundCheckDistance: 0.08
-  _groundMask:
-    serializedVersion: 2
-    m_Bits: 521
-  _standHeight: 2
-  _crouchHeight: 1
-  _cameraPivot: {fileID: 1693219965}
-  _standCameraY: 0.8
-  _crouchCameraY: 0.2
-  _crouchTransitionSpeed: 8
-  _speedMultiplier: 1
 --- !u!114 &3973712536309430585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4638,8 +4855,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6fc21415e1f0024dadd479e548cc9c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameMode.CTF.FlagCarrierComponent
-  _config: {fileID: 11400000, guid: 68a0c2bb594d2ed49b1452e9328e0615, type: 2}
+  _config: {fileID: 0}
   _carryPoint: {fileID: 263481212}
+  _authority: {fileID: 0}
+  <CarriedFlag>k__BackingField: {fileID: 0}
+  <TeamID>k__BackingField: -1
 --- !u!114 &3973712536309430586
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4652,6 +4872,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 317d4f5793a50e045b040f8dad31866f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Abilities.StatusEffects.StatusEffectManager
+  _authority: {fileID: 0}
 --- !u!114 &3973712536309430587
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4667,6 +4888,7 @@ MonoBehaviour:
   _slowPrefab: {fileID: 0}
   _freezePrefab: {fileID: 0}
   _blindPrefab: {fileID: 0}
+  _authority: {fileID: 0}
 --- !u!114 &3973712536309430588
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4681,6 +4903,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Abilities.AbilityTargetingSystem
   _playerCamera: {fileID: 799307719}
   _drawGizmos: 1
+  _authority: {fileID: 0}
 --- !u!114 &3973712536309430589
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4696,6 +4919,46 @@ MonoBehaviour:
   _abilities:
   - {fileID: 381499995}
   _useNetworking: 0
+  _authority: {fileID: 0}
+--- !u!114 &3973712536309430590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3973712536309430573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 829038245c32f714b9377370d03b478d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player.Movement.PlayerMovement_Fixed
+  _config: {fileID: 11400000, guid: d1110e6e815f38049b375b7f80d63d6b, type: 2}
+  _groundCheckOrigin: {fileID: 2143961168}
+  _groundCheckRadius: 0.25
+  _groundCheckDistance: 0.08
+  _groundMask:
+    serializedVersion: 2
+    m_Bits: 9
+  _standHeight: 2
+  _crouchHeight: 1
+  _cameraPivot: {fileID: 1693219965}
+  _standCameraY: 0.8
+  _crouchCameraY: 0.2
+  _crouchTransitionSpeed: 8
+--- !u!114 &3973712536309430591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3973712536309430573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb5013900b526a54db21a58ca099e68a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameMode.CTF.FlagCarrierComponent
+  _config: {fileID: 11400000, guid: 68a0c2bb594d2ed49b1452e9328e0615, type: 2}
+  _carryPoint: {fileID: 263481212}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

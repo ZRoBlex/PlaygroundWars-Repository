@@ -135,7 +135,7 @@ namespace Combat.Pool
         {
             if (!IsActive) return;
 
-            HitDetectionSystem.ProcessProjectileImpact(
+            HitDetectionSystem_Fixed.ProcessProjectileImpact(
                 _config, _shooterID, hitCol, point, normal);
 
             ReturnToPool();
