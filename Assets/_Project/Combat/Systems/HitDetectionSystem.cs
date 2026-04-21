@@ -142,16 +142,20 @@ namespace Combat.Systems
             if (!hitPlayer && !isHeadshot) return;
 
             int targetID = ResolveID(info.collider);
+            var damage = config.DamagePerSecond * deltaTime;
+
+             // Publicar hit para efectos visuales / audio
 
             // Daño es dps × deltaTime → no llama a CalculateDamage (distancia no aplica)
-            EventBus<Core.Events.ApplyDamageRequestEvent>.Raise(new Core.Events.    ApplyDamageRequestEvent
-            {
-                TargetPlayerID = targetID,
-                SourcePlayerID = shooterID,
-                Amount         = config.DamagePerSecond * deltaTime,
-                HitPoint       = info.point,
-                HitNormal      = info.normal
-            });
+                 EventBus<ApplyDamageRequestEvent>.Raise(
+                new ApplyDamageRequestEvent
+                {
+                    TargetID   = targetID,
+                    AttackerID = shooterID,
+                    Damage     = damage,
+                    HitPoint   = direction,
+                    HitNormal  = origin
+                });
         }
 
         // ── Helpers ───────────────────────────────────────────

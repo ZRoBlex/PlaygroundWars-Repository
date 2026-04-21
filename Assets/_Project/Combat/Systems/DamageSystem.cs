@@ -65,9 +65,9 @@ namespace Combat.Systems
             // Solicitud a PlayerHealth (Player system la procesa si tiene autoridad)
             EventBus<ApplyDamageRequestEvent>.Raise(new ApplyDamageRequestEvent
             {
-                TargetPlayerID = targetID,
-                SourcePlayerID = sourceID,
-                Amount         = finalDamage,
+                TargetID = targetID,
+                AttackerID = sourceID,
+                Damage         = finalDamage,
                 HitPoint       = hitPoint,
                 HitNormal      = hitNormal
             });

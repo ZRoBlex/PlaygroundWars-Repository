@@ -162,16 +162,16 @@ namespace Player.Events
 
     // ── Solicitudes de daño (cliente → servidor) ──────────────
 
-    /// <summary>
-    /// Solicitud de aplicar daño. Solo la autoridad la procesa.
-    /// El cliente la envía; el servidor la valida y aplica.
-    /// </summary>
-    public struct ApplyDamageRequestEvent
-    {
-        public int     TargetPlayerID;
-        public int     SourcePlayerID;
-        public float   Amount;
-        public Vector3 HitPoint;
-        public Vector3 HitNormal;
-    }
+    // /// <summary>
+    // /// Solicitud de aplicar daño. Solo la autoridad la procesa.
+    // /// El cliente la envía; el servidor la valida y aplica.
+    // /// </summary>
+    // public struct ApplyDamageRequestEvent
+    // {
+    //     public int     TargetPlayerID;
+    //     public int     SourcePlayerID;
+    //     public float   Amount;
+    //     public Vector3 HitPoint;
+    //     public Vector3 HitNormal;
+    // }
 }

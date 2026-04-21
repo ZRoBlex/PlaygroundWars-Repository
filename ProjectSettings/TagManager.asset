@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Flag
   - Base
+  - Head
   layers:
   - Default
   - TransparentFX

@@ -68,13 +68,13 @@ namespace Player.Health
         private void OnEnable()
         {
             // Escuchar solicitudes de daño (vienen de cualquier parte del juego)
-            EventBus<Player.Events.ApplyDamageRequestEvent>.Subscribe(OnDamageRequested);
+            EventBus<ApplyDamageRequestEvent>.Subscribe(OnDamageRequested);
             EventBus<PlayerStatusEffectEvent>.Subscribe(OnStatusEffect);
         }
 
         private void OnDisable()
         {
-            EventBus<Player.Events.ApplyDamageRequestEvent>.Unsubscribe(OnDamageRequested);
+            EventBus<ApplyDamageRequestEvent>.Unsubscribe(OnDamageRequested);
             EventBus<PlayerStatusEffectEvent>.Unsubscribe(OnStatusEffect);
 
             StopAllCoroutines();
@@ -258,12 +258,12 @@ namespace Player.Health
 
         // ── Callbacks de eventos ──────────────────────────────
 
-        private void OnDamageRequested(Player.Events.ApplyDamageRequestEvent e)
+        private void OnDamageRequested(ApplyDamageRequestEvent e)
         {
-            if (e.TargetPlayerID != _authority.PlayerID) return;
+            if (e.TargetID != _authority.PlayerID) return;
             if (!_authority.HasAuthority) return;
 
-            TakeDamage(e.Amount, e.SourcePlayerID, e.HitPoint, e.HitNormal);
+            TakeDamage(e.Damage, e.AttackerID, e.HitPoint, e.HitNormal);
         }
 
         private void OnStatusEffect(PlayerStatusEffectEvent e)

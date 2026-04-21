@@ -189,9 +189,9 @@ namespace Player.Controller
         {
             EventBus<ApplyDamageRequestEvent>.Raise(new ApplyDamageRequestEvent
             {
-                TargetPlayerID = _authority.PlayerID,
-                SourcePlayerID = sourceID,
-                Amount         = amount,
+                TargetID = _authority.PlayerID,
+                AttackerID = sourceID,
+                Damage         = amount,
                 HitPoint       = hitPoint,
                 HitNormal      = hitNormal
             });
