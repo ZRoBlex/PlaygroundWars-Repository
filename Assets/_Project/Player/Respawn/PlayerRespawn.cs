@@ -49,7 +49,7 @@ namespace Player.Respawn
 
         private PlayerAuthority      _authority;
         private PlayerHealth         _health;
-        private PlayerMovement       _movement;
+        private PlayerMovement_Fixed       _movement;
         private PlayerCameraController _camera;
 
         // ── Estado ────────────────────────────────────────────
@@ -67,7 +67,7 @@ namespace Player.Respawn
         {
             _authority = GetComponent<PlayerAuthority>();
             _health    = GetComponent<PlayerHealth>();
-            _movement  = GetComponent<PlayerMovement>();
+            _movement  = GetComponent<PlayerMovement_Fixed>();
             _camera    = GetComponent<PlayerCameraController>();
 
             _defaultSpawnPosition = transform.position;

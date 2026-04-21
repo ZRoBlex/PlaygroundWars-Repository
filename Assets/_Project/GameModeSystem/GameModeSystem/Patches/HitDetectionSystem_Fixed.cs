@@ -194,59 +194,59 @@ namespace Combat.Systems
         }
     }
 
-    // ── ServerDamageProcessor ─────────────────────────────────
+    // // ── ServerDamageProcessor ─────────────────────────────────
 
-    /// <summary>
-    /// Única autoridad de daño en el juego.
-    /// Añadir al [GameManager] en modo offline o al Host en multiplayer.
-    /// NO añadir a clientes remotos.
-    /// </summary>
-    public class ServerDamageProcessor : MonoBehaviour
-    {
-        [Header("Autoridad")]
-        [SerializeField] private bool _isAuthority = true;
+    // /// <summary>
+    // /// Única autoridad de daño en el juego.
+    // /// Añadir al [GameManager] en modo offline o al Host en multiplayer.
+    // /// NO añadir a clientes remotos.
+    // /// </summary>
+    // public class ServerDamageProcessor : MonoBehaviour
+    // {
+    //     [Header("Autoridad")]
+    //     [SerializeField] private bool _isAuthority = true;
 
-        [Header("Anti-Cheat")]
-        [SerializeField] private float _maxDamagePerHit = 999f;
+    //     [Header("Anti-Cheat")]
+    //     [SerializeField] private float _maxDamagePerHit = 999f;
 
-        private void OnEnable()
-        {
-            EventBus<ApplyDamageRequestEvent>.Subscribe(OnRequest);
-        }
+    //     private void OnEnable()
+    //     {
+    //         EventBus<ApplyDamageRequestEvent>.Subscribe(OnRequest);
+    //     }
 
-        private void OnDisable()
-        {
-            EventBus<ApplyDamageRequestEvent>.Unsubscribe(OnRequest);
-        }
+    //     private void OnDisable()
+    //     {
+    //         EventBus<ApplyDamageRequestEvent>.Unsubscribe(OnRequest);
+    //     }
 
-        private void OnRequest(ApplyDamageRequestEvent req)
-        {
-            if (!_isAuthority) return;
+    //     private void OnRequest(ApplyDamageRequestEvent req)
+    //     {
+    //         if (!_isAuthority) return;
 
-            // Validación anti-cheat básica
-            if (req.Damage > _maxDamagePerHit || req.TargetID < 0)
-            {
-                EventBus<DamageRequestRejectedEvent>.Raise(new DamageRequestRejectedEvent
-                {
-                    AttackerID = req.AttackerID,
-                    TargetID   = req.TargetID,
-                    Reason     = req.TargetID < 0 ? "InvalidTarget" : "ExcessiveDamage"
-                });
-                return;
-            }
+    //         // Validación anti-cheat básica
+    //         if (req.Damage > _maxDamagePerHit || req.TargetID < 0)
+    //         {
+    //             EventBus<DamageRequestRejectedEvent>.Raise(new DamageRequestRejectedEvent
+    //             {
+    //                 AttackerID = req.AttackerID,
+    //                 TargetID   = req.TargetID,
+    //                 Reason     = req.TargetID < 0 ? "InvalidTarget" : "ExcessiveDamage"
+    //             });
+    //             return;
+    //         }
 
-            // Calcular daño final (headshot + falloff)
-            float final = req.Damage;
-            if (req.IsHeadshot) final *= 2f;
+    //         // Calcular daño final (headshot + falloff)
+    //         float final = req.Damage;
+    //         if (req.IsHeadshot) final *= 2f;
 
-            EventBus<DamageAppliedEvent>.Raise(new DamageAppliedEvent
-            {
-                AttackerID  = req.AttackerID,
-                TargetID    = req.TargetID,
-                FinalDamage = Mathf.Max(1f, Mathf.Round(final)),
-                HitPoint    = req.HitPoint,
-                WeaponID    = req.WeaponID
-            });
-        }
-    }
+    //         EventBus<DamageAppliedEvent>.Raise(new DamageAppliedEvent
+    //         {
+    //             AttackerID  = req.AttackerID,
+    //             TargetID    = req.TargetID,
+    //             FinalDamage = Mathf.Max(1f, Mathf.Round(final)),
+    //             HitPoint    = req.HitPoint,
+    //             WeaponID    = req.WeaponID
+    //         });
+    //     }
+    // }
 }

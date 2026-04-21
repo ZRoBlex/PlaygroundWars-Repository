@@ -43,7 +43,7 @@ namespace Player.Controller
         [Header("Sistemas (auto-detect si están en el mismo GO)")]
         [SerializeField] private PlayerAuthority       _authority;
         [SerializeField] private PlayerInputSystem     _input;
-        [SerializeField] private PlayerMovement        _movement;
+        [SerializeField] private PlayerMovement_Fixed        _movement;
         [SerializeField] private PlayerCameraController _camera;
         [SerializeField] private PlayerHealth          _health;
         [SerializeField] private PlayerRespawn         _respawn;
@@ -55,7 +55,7 @@ namespace Player.Controller
 
         public PlayerAuthority        Authority => _authority;
         public PlayerInputSystem      Input     => _input;
-        public PlayerMovement         Movement  => _movement;
+        public PlayerMovement_Fixed         Movement  => _movement;
         public PlayerCameraController Camera    => _camera;
         public PlayerHealth           Health    => _health;
         public PlayerRespawn          Respawn   => _respawn;
@@ -231,7 +231,7 @@ namespace Player.Controller
         {
             if (_authority == null) _authority = GetComponent<PlayerAuthority>();
             if (_input     == null) _input     = GetComponent<PlayerInputSystem>();
-            if (_movement  == null) _movement  = GetComponent<PlayerMovement>();
+            if (_movement  == null) _movement  = GetComponent<PlayerMovement_Fixed>();
             if (_camera    == null) _camera    = GetComponent<PlayerCameraController>();
             if (_health    == null) _health    = GetComponent<PlayerHealth>();
             if (_respawn   == null) _respawn   = GetComponent<PlayerRespawn>();

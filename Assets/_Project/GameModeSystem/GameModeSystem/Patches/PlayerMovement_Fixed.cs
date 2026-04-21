@@ -70,6 +70,10 @@ namespace Player.Movement
         [SerializeField] private float        _crouchCameraY       = 0.2f;
         [SerializeField] private float        _crouchTransitionSpeed = 8f;
 
+
+
+        [SerializeField]private float _speedMultiplier = 1f;
+
         // ── Referencias ───────────────────────────────────────
 
         private CharacterController _cc;
@@ -108,8 +112,11 @@ namespace Player.Movement
             _authority = GetComponent<PlayerAuthority>();
 
             // Validar que la altura del config coincida con el inspector
+            // _cc.height = _standHeight;
+            // _cc.center = Vector3.up * (_standHeight * 0.5f);
             _cc.height = _standHeight;
-            _cc.center = Vector3.up * (_standHeight * 0.5f);
+            // _cc.center = new Vector3(0f, 0, 0f);
+            _cc.center = new Vector3(0f, _standHeight * 0.5f, 0f);
 
             _targetCameraY = _standCameraY;
 
@@ -147,39 +154,51 @@ namespace Player.Movement
         //  PASO 1 — Ground Check REAL (FIX del Infinite Jump)
         // ══════════════════════════════════════════════════════
 
+        // private void ValidateGrounded()
+        // {
+        //     _wasGrounded = IsGroundedReal;
+
+        //     if (_groundCheckOrigin == null)
+        //     {
+        //         IsGroundedReal = _cc.isGrounded;  // Fallback
+        //         return;
+        //     }
+
+        //     // SphereCast hacia abajo desde los pies del jugador.
+        //     // Esto es más robusto que CheckSphere en rampas y bordes.
+        //     IsGroundedReal = Physics.SphereCast(
+        //         _groundCheckOrigin.position,
+        //         _groundCheckRadius,
+        //         Vector3.down,
+        //         out _,
+        //         _groundCheckDistance,
+        //         _groundMask,
+        //         QueryTriggerInteraction.Ignore
+        //     );
+
+        //     // Aterrizaje: resetear contador de saltos
+        //     if (IsGroundedReal && !_wasGrounded)
+        //     {
+        //         _jumpsUsed     = 0;
+        //         _verticalVelocity = Mathf.Min(_verticalVelocity, 0f);
+
+        //         EventBus<PlayerLandedEvent>.Raise(new PlayerLandedEvent
+        //         {
+        //             PlayerID     = _authority.PlayerID,
+        //             FallDistance = 0f
+        //         });
+        //     }
+        // }
         private void ValidateGrounded()
         {
             _wasGrounded = IsGroundedReal;
 
-            if (_groundCheckOrigin == null)
-            {
-                IsGroundedReal = _cc.isGrounded;  // Fallback
-                return;
-            }
+            IsGroundedReal = _cc.isGrounded;
 
-            // SphereCast hacia abajo desde los pies del jugador.
-            // Esto es más robusto que CheckSphere en rampas y bordes.
-            IsGroundedReal = Physics.SphereCast(
-                _groundCheckOrigin.position,
-                _groundCheckRadius,
-                Vector3.down,
-                out _,
-                _groundCheckDistance,
-                _groundMask,
-                QueryTriggerInteraction.Ignore
-            );
-
-            // Aterrizaje: resetear contador de saltos
             if (IsGroundedReal && !_wasGrounded)
             {
-                _jumpsUsed     = 0;
+                _jumpsUsed = 0;
                 _verticalVelocity = Mathf.Min(_verticalVelocity, 0f);
-
-                EventBus<PlayerLandedEvent>.Raise(new PlayerLandedEvent
-                {
-                    PlayerID     = _authority.PlayerID,
-                    FallDistance = 0f
-                });
             }
         }
 
@@ -208,9 +227,15 @@ namespace Player.Movement
 
         private void UpdateHorizontal()
         {
-            float speed = IsCrouchingReal
+            // float speed = IsCrouchingReal
+            //     ? (_config?.CrouchSpeed ?? 2.5f)
+            //     : (IsRunning ? (_config?.RunSpeed ?? 9f) : (_config?.WalkSpeed ?? 5f));
+
+            float baseSpeed = IsCrouchingReal
                 ? (_config?.CrouchSpeed ?? 2.5f)
                 : (IsRunning ? (_config?.RunSpeed ?? 9f) : (_config?.WalkSpeed ?? 5f));
+
+            float speed = baseSpeed * _speedMultiplier;
 
             Vector3 target = (transform.right   * _moveInput.x
                             + transform.forward * _moveInput.y) * speed;
@@ -300,18 +325,33 @@ namespace Player.Movement
         {
             if (crouch == IsCrouchingReal) return;
 
+            // if (!crouch)
+            // {
+            //     // Verificar que hay espacio para ponerse de pie
+            //     // Raycast hacia arriba desde la cabeza
+            //     Vector3 headPos = transform.position + Vector3.up * _crouchHeight;
+            //     float   needed  = _standHeight - _crouchHeight;
+
+            //     if (Physics.Raycast(headPos, Vector3.up, needed + 0.05f, _groundMask))
+            //     {
+            //         // Techo encima — no puede ponerse de pie
+            //         CoreLogger.LogSystemDebug("PlayerMovement",
+            //             $"[P{_authority.PlayerID}] No puede pararse: techo detectado.");
+            //         return;
+            //     }
+            // }
+
             if (!crouch)
             {
-                // Verificar que hay espacio para ponerse de pie
-                // Raycast hacia arriba desde la cabeza
-                Vector3 headPos = transform.position + Vector3.up * _crouchHeight;
-                float   needed  = _standHeight - _crouchHeight;
+                float currentHeight = _cc.height;
+
+                Vector3 centerWorld = transform.position + _cc.center;
+                Vector3 headPos = centerWorld + Vector3.up * (currentHeight * 0.5f);
+
+                float needed = _standHeight - currentHeight;
 
                 if (Physics.Raycast(headPos, Vector3.up, needed + 0.05f, _groundMask))
                 {
-                    // Techo encima — no puede ponerse de pie
-                    CoreLogger.LogSystemDebug("PlayerMovement",
-                        $"[P{_authority.PlayerID}] No puede pararse: techo detectado.");
                     return;
                 }
             }
@@ -393,6 +433,13 @@ namespace Player.Movement
         {
             _verticalVelocity  += impulse.y;
             _horizontalVelocity += new Vector3(impulse.x, 0f, impulse.z);
+        }
+
+
+
+        public void SetSpeedMultiplier(float mult)
+        {
+            _speedMultiplier = Mathf.Clamp(mult, 0f, 1f);
         }
 
         // ── Gizmos ────────────────────────────────────────────

@@ -252,7 +252,7 @@ namespace GameMode.Editor
                 "El evento está en GameEvents_Additions.cs", true);
 
             // CHECK 2: ServerDamageProcessor en escena
-            var sdp = FindFirstObjectByType<Combat.Systems.ServerDamageProcessor>();
+            var sdp = FindFirstObjectByType<ServerDamageProcessor>();
             DrawCheck("ServerDamageProcessor en escena",
                 sdp != null ? "✅ Encontrado" : "❌ Añadir ServerDamageProcessor a [GameManager]",
                 sdp != null);

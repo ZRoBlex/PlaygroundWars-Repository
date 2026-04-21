@@ -192,9 +192,9 @@ namespace Player.Editor
             if (m != null)
             {
                 EditorGUILayout.LabelField($"Velocidad:     {m.Velocity.magnitude:F2} u/s");
-                EditorGUILayout.LabelField($"En suelo:      {m.IsGrounded}");
+                EditorGUILayout.LabelField($"En suelo:      {m.IsGroundedReal}");
                 EditorGUILayout.LabelField($"Corriendo:     {m.IsRunning}");
-                EditorGUILayout.LabelField($"Agachado:      {m.IsCrouching}");
+                EditorGUILayout.LabelField($"Agachado:      {m.IsCrouchingReal}");
             }
         }
 
@@ -242,9 +242,9 @@ namespace Player.Editor
             EditorGUI.BeginDisabledGroup(true);
             EditorGUILayout.Vector3Field("Velocity", m.Velocity);
             EditorGUILayout.FloatField("Speed", m.Velocity.magnitude);
-            EditorGUILayout.Toggle("Is Grounded", m.IsGrounded);
+            EditorGUILayout.Toggle("Is Grounded", m.IsGroundedReal);
             EditorGUILayout.Toggle("Is Running",  m.IsRunning);
-            EditorGUILayout.Toggle("Is Crouching",m.IsCrouching);
+            EditorGUILayout.Toggle("Is Crouching",m.IsCrouchingReal);
             EditorGUI.EndDisabledGroup();
 
             EditorGUILayout.Space(8);
