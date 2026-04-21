@@ -46,143 +46,143 @@ namespace GMF
     //  CAPTURE ZONE
     // ════════════════════════════════════════════════════════
 
-    [RequireComponent(typeof(Collider))]
-    public class CaptureZone : ObjectiveBase
-    {
-        protected override void Start()
-        {
-            GetComponent<Collider>().isTrigger = true;
-            base.Start();
-        }
+    // [RequireComponent(typeof(Collider))]
+    // public class CaptureZone : ObjectiveBase
+    // {
+    //     protected override void Start()
+    //     {
+    //         GetComponent<Collider>().isTrigger = true;
+    //         base.Start();
+    //     }
 
-        private void OnTriggerEnter(Collider other)
-        {
-            if (!IsActive) return;
-            var auth = other.GetComponentInParent<PlayerAuthority>();
-            if (auth == null) return;
+    //     private void OnTriggerEnter(Collider other)
+    //     {
+    //         if (!IsActive) return;
+    //         var auth = other.GetComponentInParent<PlayerAuthority>();
+    //         if (auth == null) return;
 
-            int pid   = auth.PlayerID;
-            int pTeam = GetPlayerTeam(pid);
+    //         int pid   = auth.PlayerID;
+    //         int pTeam = GetPlayerTeam(pid);
 
-            // "Enter" siempre. Las reglas deciden si hay captura.
-            EmitInteraction("Enter", pid, pTeam);
+    //         // "Enter" siempre. Las reglas deciden si hay captura.
+    //         EmitInteraction("Enter", pid, pTeam);
 
-            // Si el jugador porta un objetivo → es intento de captura
-            var carrier = auth.GetComponent<FlagCarrierBridge>();
-            if (carrier != null && carrier.IsCarrying)
-                EmitInteraction("Capture", pid, pTeam);
-        }
+    //         // Si el jugador porta un objetivo → es intento de captura
+    //         var carrier = auth.GetComponent<FlagCarrierBridge>();
+    //         if (carrier != null && carrier.IsCarrying)
+    //             EmitInteraction("Capture", pid, pTeam);
+    //     }
 
-        private void OnTriggerExit(Collider other)
-        {
-            if (!IsActive) return;
-            var auth = other.GetComponentInParent<PlayerAuthority>();
-            if (auth == null) return;
-            EmitInteraction("Exit", auth.PlayerID, GetPlayerTeam(auth.PlayerID));
-        }
+    //     private void OnTriggerExit(Collider other)
+    //     {
+    //         if (!IsActive) return;
+    //         var auth = other.GetComponentInParent<PlayerAuthority>();
+    //         if (auth == null) return;
+    //         EmitInteraction("Exit", auth.PlayerID, GetPlayerTeam(auth.PlayerID));
+    //     }
 
-        public override void Reset() { State = "Idle"; }
+    //     public override void Reset() { State = "Idle"; }
 
-        private int GetPlayerTeam(int pid)
-        {
-            var gm = FindFirstObjectByType<GameModeBase>();
-            return gm?.Context?.Teams?.GetTeam(pid) ?? -1;
-        }
+    //     private int GetPlayerTeam(int pid)
+    //     {
+    //         var gm = FindFirstObjectByType<GameModeBase>();
+    //         return gm?.Context?.Teams?.GetTeam(pid) ?? -1;
+    //     }
 
-        private void OnDrawGizmosSelected()
-        {
-            Gizmos.color = _teamID == 0
-                ? new Color(1f, 0.2f, 0.2f, 0.3f)
-                : new Color(0.2f, 0.2f, 1f, 0.3f);
-            Gizmos.DrawCube(transform.position, transform.localScale);
-        }
-    }
+    //     private void OnDrawGizmosSelected()
+    //     {
+    //         Gizmos.color = _teamID == 0
+    //             ? new Color(1f, 0.2f, 0.2f, 0.3f)
+    //             : new Color(0.2f, 0.2f, 1f, 0.3f);
+    //         Gizmos.DrawCube(transform.position, transform.localScale);
+    //     }
+    // }
 
     // ════════════════════════════════════════════════════════
     //  CONTROL POINT (KOTH)
     // ════════════════════════════════════════════════════════
 
-    [RequireComponent(typeof(Collider))]
-    public class ControlPoint : ObjectiveBase
-    {
-        [Header("Control Point")]
-        [Tooltip("Segundos entre Tick events cuando hay ocupante.")]
-        [SerializeField] private float _tickInterval = 1f;
+    // [RequireComponent(typeof(Collider))]
+    // public class ControlPoint : ObjectiveBase
+    // {
+    //     [Header("Control Point")]
+    //     [Tooltip("Segundos entre Tick events cuando hay ocupante.")]
+    //     [SerializeField] private float _tickInterval = 1f;
 
-        private readonly HashSet<int> _occupants = new();
-        private float                 _tickTimer;
+    //     private readonly HashSet<int> _occupants = new();
+    //     private float                 _tickTimer;
 
-        protected override void Start()
-        {
-            GetComponent<Collider>().isTrigger = true;
-            base.Start();
-        }
+    //     protected override void Start()
+    //     {
+    //         GetComponent<Collider>().isTrigger = true;
+    //         base.Start();
+    //     }
 
-        // UPDATE JUSTIFICADO: acumular tiempo para emitir Tick a intervalos.
-        private void Update()
-        {
-            if (!IsActive || _occupants.Count == 0) return;
+    //     // UPDATE JUSTIFICADO: acumular tiempo para emitir Tick a intervalos.
+    //     private void Update()
+    //     {
+    //         if (!IsActive || _occupants.Count == 0) return;
 
-            _tickTimer += Time.deltaTime;
-            if (_tickTimer < _tickInterval) return;
+    //         _tickTimer += Time.deltaTime;
+    //         if (_tickTimer < _tickInterval) return;
 
-            _tickTimer = 0f;
-            // Emitir Tick con el primer ocupante (las reglas calculan el equipo dominante)
-            foreach (var pid in _occupants)
-            {
-                int pTeam = GetPlayerTeam(pid);
-                EmitInteraction("Tick", pid, pTeam);
-                break;
-            }
-        }
+    //         _tickTimer = 0f;
+    //         // Emitir Tick con el primer ocupante (las reglas calculan el equipo dominante)
+    //         foreach (var pid in _occupants)
+    //         {
+    //             int pTeam = GetPlayerTeam(pid);
+    //             EmitInteraction("Tick", pid, pTeam);
+    //             break;
+    //         }
+    //     }
 
-        private void OnTriggerEnter(Collider other)
-        {
-            if (!IsActive) return;
-            var auth = other.GetComponentInParent<PlayerAuthority>();
-            if (auth == null) return;
+    //     private void OnTriggerEnter(Collider other)
+    //     {
+    //         if (!IsActive) return;
+    //         var auth = other.GetComponentInParent<PlayerAuthority>();
+    //         if (auth == null) return;
 
-            int pid = auth.PlayerID;
-            if (_occupants.Add(pid))
-            {
-                State = _occupants.Count > 0 ? "Contested" : "Idle";
-                EmitInteraction("Enter", pid, GetPlayerTeam(pid));
-            }
-        }
+    //         int pid = auth.PlayerID;
+    //         if (_occupants.Add(pid))
+    //         {
+    //             State = _occupants.Count > 0 ? "Contested" : "Idle";
+    //             EmitInteraction("Enter", pid, GetPlayerTeam(pid));
+    //         }
+    //     }
 
-        private void OnTriggerExit(Collider other)
-        {
-            if (!IsActive) return;
-            var auth = other.GetComponentInParent<PlayerAuthority>();
-            if (auth == null) return;
+    //     private void OnTriggerExit(Collider other)
+    //     {
+    //         if (!IsActive) return;
+    //         var auth = other.GetComponentInParent<PlayerAuthority>();
+    //         if (auth == null) return;
 
-            int pid = auth.PlayerID;
-            if (_occupants.Remove(pid))
-            {
-                State = _occupants.Count == 0 ? "Idle" : "Contested";
-                EmitInteraction("Exit", pid, GetPlayerTeam(pid));
-            }
-        }
+    //         int pid = auth.PlayerID;
+    //         if (_occupants.Remove(pid))
+    //         {
+    //             State = _occupants.Count == 0 ? "Idle" : "Contested";
+    //             EmitInteraction("Exit", pid, GetPlayerTeam(pid));
+    //         }
+    //     }
 
-        public override void Reset()
-        {
-            _occupants.Clear();
-            _tickTimer = 0f;
-            State = "Idle";
-        }
+    //     public override void Reset()
+    //     {
+    //         _occupants.Clear();
+    //         _tickTimer = 0f;
+    //         State = "Idle";
+    //     }
 
-        private int GetPlayerTeam(int pid)
-        {
-            var gm = FindFirstObjectByType<GameModeBase>();
-            return gm?.Context?.Teams?.GetTeam(pid) ?? -1;
-        }
+    //     private int GetPlayerTeam(int pid)
+    //     {
+    //         var gm = FindFirstObjectByType<GameModeBase>();
+    //         return gm?.Context?.Teams?.GetTeam(pid) ?? -1;
+    //     }
 
-        private void OnDrawGizmosSelected()
-        {
-            Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
-            Gizmos.DrawSphere(transform.position, transform.localScale.x * 0.5f);
-        }
-    }
+    //     private void OnDrawGizmosSelected()
+    //     {
+    //         Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
+    //         Gizmos.DrawSphere(transform.position, transform.localScale.x * 0.5f);
+    //     }
+    // }
 
     // ════════════════════════════════════════════════════════
     //  FLAG CARRIER BRIDGE
@@ -194,24 +194,24 @@ namespace GMF
     /// Añadir al prefab del jugador.
     /// Permite que CaptureZone sepa si el jugador lleva bandera.
     /// </summary>
-    public class FlagCarrierBridge : MonoBehaviour
-    {
-        public bool   IsCarrying         { get; private set; }
-        public string CarriedObjectiveID { get; private set; }
-        public Flag   CarriedFlag        { get; private set; }
+    // public class FlagCarrierBridge : MonoBehaviour
+    // {
+    //     public bool   IsCarrying         { get; private set; }
+    //     public string CarriedObjectiveID { get; private set; }
+    //     public Flag   CarriedFlag        { get; private set; }
 
-        public void SetCarrying(Flag flag)
-        {
-            CarriedFlag        = flag;
-            CarriedObjectiveID = flag?.ObjectiveID ?? string.Empty;
-            IsCarrying         = flag != null;
-        }
+    //     public void SetCarrying(Flag flag)
+    //     {
+    //         CarriedFlag        = flag;
+    //         CarriedObjectiveID = flag?.ObjectiveID ?? string.Empty;
+    //         IsCarrying         = flag != null;
+    //     }
 
-        public void ClearCarrying()
-        {
-            CarriedFlag        = null;
-            CarriedObjectiveID = string.Empty;
-            IsCarrying         = false;
-        }
-    }
+    //     public void ClearCarrying()
+    //     {
+    //         CarriedFlag        = null;
+    //         CarriedObjectiveID = string.Empty;
+    //         IsCarrying         = false;
+    //     }
+    // }
 }
