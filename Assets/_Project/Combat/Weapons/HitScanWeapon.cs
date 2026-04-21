@@ -54,7 +54,7 @@ namespace Combat.Weapons
             }
 
             // Detección de impacto y daño
-            HitDetectionSystem.ProcessHitScan(_config, _authority.PlayerID, origin, direction);
+            HitDetectionSystem_Fixed.ProcessHitScan(_config, _authority.PlayerID, Camera.main, direction);
 
             // FX: tracer visual
             if (_tracerLine != null)

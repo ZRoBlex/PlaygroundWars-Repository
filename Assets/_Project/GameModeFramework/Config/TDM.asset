@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9d5db95278719b4fabc8358ea4b721e, type: 3}
+  m_Name: TDM
+  m_EditorClassIdentifier: Assembly-CSharp::GameMode.Framework.Config.GameModeDefinitionSO
+  _modeID: TDM
+  _displayName: TDM
+  _rules: []
+  _winConditions: []
+  _teamConfig:
+    TeamCount: 2
+    MaxPerTeam: 5
+    AutoBalance: 1
+    TeamNames:
+    - Red
+    - Blue
+    TeamColors:
+    - {r: 1, g: 0, b: 0, a: 1}
+    - {r: 0, g: 0, b: 1, a: 1}
+  _roundConfig:
+    TotalRounds: 1
+    RoundsToWinMatch: 1
+    RoundDuration: 300
+    WarmUpDuration: 5
+    RoundEndDuration: 5
+  _scoreConfig:
+    TrackIndividualScore: 1
+    ScoreToWin: 3
+  references:
+    version: 2
+    RefIds: []
