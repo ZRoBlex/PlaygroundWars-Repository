@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7b8459f7a16f3a408513d7f99dc84be, type: 3}
+  m_Name: NewWeapon
+  m_EditorClassIdentifier: Assembly-CSharp::Combat.WeaponConfig
+  WeaponID: weapon_default
+  DisplayName: Arma
+  ShootingType: 1
+  IsAutomatic: 0
+  BaseDamage: 25
+  HeadshotMultiplier: 2
+  DamageFalloffStart: 20
+  DamageFalloffEnd: 80
+  MinDamageFraction: 0.1
+  FireRate: 0.15
+  MagazineSize: 30
+  MaxReserveAmmo: 120
+  InfiniteReserve: 0
+  ReloadTime: 2
+  AutoReload: 1
+  MaxRange: 100
+  HitLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  PelletsPerShot: 1
+  SpreadAngle: 0
+  ProjectileSpeed: 20
+  ProjectileGravity: 1
+  ProjectileLifetime: 5
+  ProjectilePrefab: {fileID: 3687977277755752575, guid: c5fceb62c04e0bb4793afa4e952875a3, type: 3}
+  DamagePerSecond: 15
+  ContinuousRange: 15
+  RecoilPitch: 1
+  RecoilYawVariance: 0.5
+  RecoilRecoveryRate: 0.6
+  RecoilPattern: []
+  UseNetworking: 0
