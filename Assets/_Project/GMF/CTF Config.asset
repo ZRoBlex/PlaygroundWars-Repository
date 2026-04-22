@@ -20,7 +20,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6159720d7ef28ff4580b7863c30d74ad, type: 2}
   - {fileID: 11400000, guid: 6042b0526e4392c469a8fcc71d6607f7, type: 2}
   _winConditions:
-  - {fileID: 11400000, guid: c797e1c770ac9fa4fb2151093d17cdc4, type: 2}
   - {fileID: 11400000, guid: d70cae73730648740940548363edbb5b, type: 2}
   _teamConfig:
     TeamCount: 2

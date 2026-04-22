@@ -1,23 +1,18 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  ARCHIVO: GMF_Zones.cs  (REEMPLAZA el anterior)          ║
 // ║                                                          ║
-// ║  CLASES INCLUIDAS:                                       ║
-// ║    • CaptureZone      (MonoBehaviour)                    ║
-// ║    • ControlPoint     (MonoBehaviour)                    ║
-// ║    • FlagCarrierBridge (MonoBehaviour)                   ║
+// ║  CLASES:                                                 ║
+// ║    • FlagCarrierBridge  ← añadir al prefab del jugador   ║
+// ║    • CaptureZone        ← añadir a las bases             ║
+// ║    • ControlPoint       ← añadir a puntos de control     ║
 // ║                                                          ║
-// ║  ⚠️ SEPARAR (lo haces tú):                              ║
-// ║    GMF_CaptureZone.cs      → se añade a GameObject zona  ║
-// ║    GMF_ControlPoint.cs     → se añade a GameObject punto ║
-// ║    GMF_FlagCarrierBridge.cs → se añade al prefab jugador ║
-// ║    Mismo namespace GMF en los 3 archivos.                ║
+// ║  ⚠️ SEPARAR: un archivo por clase (mismo namespace GMF) ║
 // ║                                                          ║
-// ║  CAMBIOS:                                                ║
-// ║    + CaptureZone valida que el jugador lleve una bandera  ║
-// ║      enemiga ANTES de emitir "Capture"                   ║
-// ║    + El evento incluye CarriedObjectiveID                 ║
-// ║      (ObjectiveCaptureRule lo usa para resetear la flag)  ║
-// ║    - GetPlayerTeam usa GameModeBase.Instance              ║
+// ║  FIX PRINCIPAL:                                          ║
+// ║    CaptureZone ya NO requiere FlagCarrierBridge.         ║
+// ║    Consulta la lista de flags en ObjectiveRegistry para  ║
+// ║    saber si el jugador porta una bandera enemiga.        ║
+// ║    Así funciona aunque el jugador no tenga el bridge.    ║
 // ╚══════════════════════════════════════════════════════════╝
 
 using System.Collections.Generic;
@@ -27,19 +22,16 @@ using UnityEngine;
 namespace GMF
 {
     // ════════════════════════════════════════════════════════
-    //  CONTROL POINT
-    //  ► Para modos KOTH
-    //  ► Emite "Tick" cada _tickInterval segundos si hay alguien
+    //  CONTROL POINT (King of the Hill)
     // ════════════════════════════════════════════════════════
 
     [RequireComponent(typeof(Collider))]
     public class ControlPoint : ObjectiveBase
     {
         [Header("Control Point")]
-        [Tooltip("Segundos entre Tick events.")]
         [SerializeField] private float _tickInterval = 1f;
 
-        private readonly HashSet<int> _occupants = new();
+        private readonly HashSet<int> _occupants  = new();
         private float                 _tickTimer;
 
         protected override void Start()
@@ -48,7 +40,6 @@ namespace GMF
             base.Start();
         }
 
-        // UPDATE JUSTIFICADO: acumular tiempo para emitir Tick periódico.
         private void Update()
         {
             if (!IsActive || _occupants.Count == 0) return;
@@ -68,10 +59,11 @@ namespace GMF
             if (!IsActive) return;
             var auth = other.GetComponentInParent<PlayerAuthority>();
             if (auth == null) return;
-            int pid = auth.PlayerID;
-            if (!_occupants.Add(pid)) return;
-            State = "Contested";
-            EmitInteraction("Enter", pid, GetPlayerTeam(pid));
+            if (_occupants.Add(auth.PlayerID))
+            {
+                State = "Contested";
+                EmitInteraction("Enter", auth.PlayerID, GetPlayerTeam(auth.PlayerID));
+            }
         }
 
         private void OnTriggerExit(Collider other)
@@ -79,17 +71,18 @@ namespace GMF
             if (!IsActive) return;
             var auth = other.GetComponentInParent<PlayerAuthority>();
             if (auth == null) return;
-            int pid = auth.PlayerID;
-            if (!_occupants.Remove(pid)) return;
-            State = _occupants.Count == 0 ? "Idle" : "Contested";
-            EmitInteraction("Exit", pid, GetPlayerTeam(pid));
+            if (_occupants.Remove(auth.PlayerID))
+            {
+                State = _occupants.Count == 0 ? "Idle" : "Contested";
+                EmitInteraction("Exit", auth.PlayerID, GetPlayerTeam(auth.PlayerID));
+            }
         }
 
         public override void Reset()
         {
             _occupants.Clear();
             _tickTimer = 0f;
-            State = "Idle";
+            State      = "Idle";
         }
 
         private int GetPlayerTeam(int pid)
@@ -97,7 +90,7 @@ namespace GMF
 
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
+            Gizmos.color = new Color(1f, 1f, 0f, 0.4f);
             Gizmos.DrawSphere(transform.position, transform.localScale.x * 0.5f);
         }
     }

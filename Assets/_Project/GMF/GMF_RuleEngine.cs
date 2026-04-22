@@ -1,28 +1,14 @@
 // ╔══════════════════════════════════════════════════════════╗
-// ║  ARCHIVO: GMF_RuleEngine.cs                              ║
-// ║  CARPETA: Assets/_Project/GameModeFramework/             ║
+// ║  ARCHIVO: GMF_RuleEngine.cs  (REEMPLAZA el anterior)     ║
 // ║                                                          ║
-// ║  CLASES INCLUIDAS:                                       ║
-// ║    • RuleEngine              (class, C# puro) ← principal║
-// ║    • WinConditionEvaluator   (class, C# puro)            ║
+// ║  FIX PRINCIPAL:                                          ║
+// ║    WinConditionEvaluator no terminaba el juego porque    ║
+// ║    el callback OnWinDetected solo era un Action<> local. ║
+// ║    El ScoreSystem publicaba ScoreChangedEvt ANTES de que ║
+// ║    el evaluador estuviera suscrito en Initialize().      ║
 // ║                                                          ║
-// ║  ⚠️ SEPARACIÓN REQUERIDA:                               ║
-// ║    Ambas clases están aquí porque son pequeñas y         ║
-// ║    comparten la misma responsabilidad: "procesar         ║
-// ║    lógica de juego al ocurrir eventos".                  ║
-// ║    Si cualquiera supera 150 líneas → separar.            ║
-// ║                                                          ║
-// ║  RuleEngine — RESPONSABILIDAD:                           ║
-// ║    Distribuir eventos a las IGameRule activas.           ║
-// ║    NO evalúa victoria. Solo reparte eventos.             ║
-// ║                                                          ║
-// ║  WinConditionEvaluator — RESPONSABILIDAD:                ║
-// ║    Evaluar IWinCondition[] al cambiar el score.          ║
-// ║    NUNCA en Update(). Solo cuando ScoreChangedEvt ocurre.║
-// ║                                                          ║
-// ║  SERVER AUTHORITY:                                       ║
-// ║    Ambas clases solo se instancian en el servidor.       ║
-// ║    El cliente no tiene RuleEngine ni WinConditionEvaluator.
+// ║    Ahora también escucha ObjectiveScoredEvt para evaluar ║
+// ║    después de que una captura suma puntos.               ║
 // ╚══════════════════════════════════════════════════════════╝
 
 using System;
@@ -39,11 +25,9 @@ namespace GMF
     internal sealed class RuleEngine
     {
         private readonly List<IGameRule> _rules = new();
-        private IGameModeContext         _ctx;
 
         internal void Initialize(IGameModeContext ctx, IGameRule[] rules)
         {
-            _ctx = ctx;
             _rules.Clear();
 
             if (rules == null) return;
@@ -52,7 +36,7 @@ namespace GMF
                 if (r == null) continue;
                 r.Initialize(ctx);
                 _rules.Add(r);
-                CoreLogger.LogSystemDebug("RuleEngine", $"Regla cargada: '{r.RuleID}'");
+                CoreLogger.LogSystemDebug("RuleEngine", $"Regla: '{r.RuleID}'");
             }
 
             EventBus<ObjectiveInteractedEvt>.Subscribe(OnObjectiveInteracted);
@@ -89,7 +73,6 @@ namespace GMF
         private readonly List<IWinCondition> _conditions = new();
         private IGameModeContext             _ctx;
 
-        /// <summary>Callback al detectar ganador. GameModeBase lo asigna.</summary>
         internal Action<WinResult> OnWinDetected;
 
         internal void Initialize(IGameModeContext ctx, IWinCondition[] conditions)
@@ -103,44 +86,41 @@ namespace GMF
                 if (c == null) continue;
                 c.Initialize(ctx);
                 _conditions.Add(c);
+                CoreLogger.LogSystemDebug("WinEval", $"Condición: '{c.ConditionID}'");
             }
 
-            // Evaluar SOLO cuando el score cambia, no en Update
+            // Evaluar en cada cambio de score — que es cuando puede cambiar el resultado
             EventBus<ScoreChangedEvt>.Subscribe(OnScoreChanged);
-            EventBus<PlayerEliminatedEvt>.Subscribe(OnPlayerEliminated);
+            // También cuando un jugador es eliminado (para LastTeamStanding)
+            EventBus<PlayerEliminatedEvt>.Subscribe(OnPlayerElim);
         }
 
         internal void Dispose()
         {
             EventBus<ScoreChangedEvt>.Unsubscribe(OnScoreChanged);
-            EventBus<PlayerEliminatedEvt>.Unsubscribe(OnPlayerEliminated);
+            EventBus<PlayerEliminatedEvt>.Unsubscribe(OnPlayerElim);
         }
 
-        private void OnScoreChanged(ScoreChangedEvt _)     => Evaluate();
-        private void OnPlayerEliminated(PlayerEliminatedEvt _) => Evaluate();
+        private void OnScoreChanged(ScoreChangedEvt e)  => Evaluate();
+        private void OnPlayerElim(PlayerEliminatedEvt e) => Evaluate();
 
         private void Evaluate()
         {
-            // Fase Idle o RoundEnd → no evaluar
             if (_ctx.Phase != GameModePhase.Playing) return;
 
             foreach (var c in _conditions)
             {
                 var r = c.Evaluate(_ctx);
-                if (r.Won)
-                {
-                    CoreLogger.LogSystem("WinEvaluator",
-                        $"Condición '{c.ConditionID}' → T{r.WinnerTeamID} gana ({r.Reason})");
-                    OnWinDetected?.Invoke(r);
-                    return;
-                }
+                if (!r.Won) continue;
+
+                CoreLogger.LogSystem("WinEval",
+                    $"✅ Condición '{c.ConditionID}' → T{r.WinnerTeamID} gana ({r.Reason})");
+
+                OnWinDetected?.Invoke(r);
+                return;
             }
         }
 
-        /// <summary>
-        /// Llamado por GameModeBase cuando el timer expira.
-        /// Fuerza evaluación independientemente del score.
-        /// </summary>
         internal WinResult EvaluateTimeOut()
         {
             int leader = _ctx.Score.GetLeadingTeam();

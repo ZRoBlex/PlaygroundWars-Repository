@@ -1,23 +1,18 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  ARCHIVO: GMF_Zones.cs  (REEMPLAZA el anterior)          ║
 // ║                                                          ║
-// ║  CLASES INCLUIDAS:                                       ║
-// ║    • CaptureZone      (MonoBehaviour)                    ║
-// ║    • ControlPoint     (MonoBehaviour)                    ║
-// ║    • FlagCarrierBridge (MonoBehaviour)                   ║
+// ║  CLASES:                                                 ║
+// ║    • FlagCarrierBridge  ← añadir al prefab del jugador   ║
+// ║    • CaptureZone        ← añadir a las bases             ║
+// ║    • ControlPoint       ← añadir a puntos de control     ║
 // ║                                                          ║
-// ║  ⚠️ SEPARAR (lo haces tú):                              ║
-// ║    GMF_CaptureZone.cs      → se añade a GameObject zona  ║
-// ║    GMF_ControlPoint.cs     → se añade a GameObject punto ║
-// ║    GMF_FlagCarrierBridge.cs → se añade al prefab jugador ║
-// ║    Mismo namespace GMF en los 3 archivos.                ║
+// ║  ⚠️ SEPARAR: un archivo por clase (mismo namespace GMF) ║
 // ║                                                          ║
-// ║  CAMBIOS:                                                ║
-// ║    + CaptureZone valida que el jugador lleve una bandera  ║
-// ║      enemiga ANTES de emitir "Capture"                   ║
-// ║    + El evento incluye CarriedObjectiveID                 ║
-// ║      (ObjectiveCaptureRule lo usa para resetear la flag)  ║
-// ║    - GetPlayerTeam usa GameModeBase.Instance              ║
+// ║  FIX PRINCIPAL:                                          ║
+// ║    CaptureZone ya NO requiere FlagCarrierBridge.         ║
+// ║    Consulta la lista de flags en ObjectiveRegistry para  ║
+// ║    saber si el jugador porta una bandera enemiga.        ║
+// ║    Así funciona aunque el jugador no tenga el bridge.    ║
 // ╚══════════════════════════════════════════════════════════╝
 
 using System.Collections.Generic;
@@ -27,10 +22,9 @@ using UnityEngine;
 namespace GMF
 {
     // ════════════════════════════════════════════════════════
-    //  FLAG CARRIER BRIDGE
-    //  ► Añadir al prefab del jugador
-    //  ► Permite que CaptureZone sepa si el jugador lleva flag
-    //  ► Flag.DoPickUp() / DoClear() lo actualiza automáticamente
+    //  FLAG CARRIER BRIDGE (OPCIONAL)
+    //  ► Añadir al prefab del jugador si quieres
+    //  ► CaptureZone ya no depende de él
     // ════════════════════════════════════════════════════════
 
     public class FlagCarrierBridge : MonoBehaviour
@@ -38,6 +32,9 @@ namespace GMF
         public bool   IsCarrying         { get; private set; }
         public Flag   CarriedFlag        { get; private set; }
         public string CarriedObjectiveID { get; private set; }
+        [SerializeField] private Transform _carryPoint;
+
+        public Transform CarryPoint => _carryPoint;
 
         public void SetCarrying(Flag flag)
         {

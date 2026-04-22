@@ -1,12 +1,13 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  ARCHIVO: GMF_GameModeBase.cs  (REEMPLAZA el anterior)   ║
 // ║                                                          ║
-// ║  CAMBIOS:                                                ║
-// ║    + static Instance → Flag/Zones lo usan sin Find       ║
-// ║    + auto-asignación de equipos en PlayerReadyEvent      ║
-// ║    + GameModeBase ya NO se desactiva — GameModeManager   ║
-// ║      simplemente no llama StartGame() en los inactivos   ║
-// ║    - Eliminado: 'enabled = false' cuando _def es null    ║
+// ║  FIXES CRÍTICOS:                                         ║
+// ║    ✅ StartGame() escanea la escena y asigna TODOS los   ║
+// ║       PlayerAuthority existentes a equipos              ║
+// ║    ✅ OnPlayerReady asigna aunque el juego no haya       ║
+// ║       empezado (jugadores listos antes de StartGame)     ║
+// ║    ✅ Instance se setea en Awake (no solo en StartGame)  ║
+// ║       para que flags/zonas funcionen desde el inicio     ║
 // ╚══════════════════════════════════════════════════════════╝
 
 using System.Collections;
@@ -23,9 +24,6 @@ namespace GMF
     public class GameModeBase : MonoBehaviour
     {
         // ── Static Instance ───────────────────────────────────
-        // ► Punto de acceso sin FindObjectOfType.
-        // ► Flag, CaptureZone y reglas lo usan para consultar Teams.
-        // ► Se setea en StartGame(), se limpia en ResetGame/EndGame.
 
         public static GameModeBase Instance { get; private set; }
 
@@ -34,7 +32,7 @@ namespace GMF
         [Header("Definición del modo")]
         [SerializeField] private GMF_Config _def;
 
-        [Tooltip("true = servidor/host/offline.  false = cliente puro (NO evalúa reglas).")]
+        [Tooltip("true = servidor/host/offline. false = cliente puro.")]
         [SerializeField] private bool _isAuthority = true;
 
         // ── Subsistemas ───────────────────────────────────────
@@ -45,7 +43,7 @@ namespace GMF
         private Coroutine             _phaseCoroutine;
         private readonly Dictionary<int, int> _roundWins = new();
 
-        // ── Estado público ────────────────────────────────────
+        // ── Estado ────────────────────────────────────────────
 
         public IGameModeContext Context     => _ctx;
         public bool             IsRunning   { get; private set; }
@@ -56,6 +54,14 @@ namespace GMF
 
         private void Awake()
         {
+            // ✅ Instance en Awake (no solo en StartGame)
+            // Flags y zonas usan Instance.Context.Teams desde Start()
+            if (Instance == null) Instance = this;
+            else if (Instance != this)
+            {
+                CoreLogger.LogWarning("[GameModeBase] Instancia duplicada detectada.");
+            }
+
             if (_def == null)
             {
                 CoreLogger.LogError($"[GameModeBase] '{name}': GameModeDefinitionSO no asignado.");
@@ -70,8 +76,8 @@ namespace GMF
                 _ruleEngine = new RuleEngine();
                 _ruleEngine.Initialize(_ctx, _def.GetRules());
 
-                _winEval                = new WinConditionEvaluator();
-                _winEval.OnWinDetected  = OnWinDetected;
+                _winEval               = new WinConditionEvaluator();
+                _winEval.OnWinDetected = OnWinDetected;
                 _winEval.Initialize(_ctx, _def.GetWinConditions());
             }
 
@@ -80,7 +86,6 @@ namespace GMF
 
         private void OnEnable()
         {
-            // Asignación automática de equipos cuando un jugador está listo
             EventBus<PlayerReadyEvent>.Subscribe(OnPlayerReady);
         }
 
@@ -97,14 +102,44 @@ namespace GMF
             if (Instance == this) Instance = null;
         }
 
-        // ── Team auto-assign ──────────────────────────────────
+        // ── Team assignment ───────────────────────────────────
+
+        /// <summary>
+        /// Asigna equipo a todos los PlayerAuthority en escena.
+        /// Llamado en StartGame() y desde PlayerTeamAssigner.
+        /// </summary>
+        public void AssignAllPlayersToTeams()
+        {
+            if (_ctx == null) return;
+
+            var authorities = FindObjectsByType<Player.Authority.PlayerAuthority>(
+                FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+
+            int assigned = 0;
+            foreach (var auth in authorities)
+            {
+                if (_ctx.Teams.GetTeam(auth.PlayerID) < 0)
+                {
+                    _ctx._teams.AutoAssign(auth.PlayerID);
+                    assigned++;
+                }
+            }
+
+            if (assigned > 0)
+                CoreLogger.LogSystem("GameModeBase", $"{assigned} jugador(es) asignado(s) a equipos.");
+        }
 
         private void OnPlayerReady(PlayerReadyEvent e)
         {
-            if (!_isAuthority || !IsRunning) return;
-            if (_ctx.Teams.GetTeam(e.PlayerID) >= 0) return; // ya asignado
+            if (!_isAuthority || _ctx == null) return;
 
-            _ctx._teams.AutoAssign(e.PlayerID);
+            // ✅ Asignar SIEMPRE, no solo cuando IsRunning
+            if (_ctx.Teams.GetTeam(e.PlayerID) < 0)
+            {
+                _ctx._teams.AutoAssign(e.PlayerID);
+                CoreLogger.LogSystemDebug("GameModeBase",
+                    $"P{e.PlayerID} asignado al equipo {_ctx.Teams.GetTeam(e.PlayerID)}");
+            }
         }
 
         // ── API Pública ───────────────────────────────────────
@@ -126,6 +161,9 @@ namespace GMF
             Instance  = this;
             IsRunning = true;
             _roundWins.Clear();
+
+            // ✅ Asignar todos los jugadores existentes ANTES de la partida
+            AssignAllPlayersToTeams();
 
             CoreLogger.LogSystem("GameModeBase", $"[{ModeID}] StartGame()");
 
@@ -210,7 +248,7 @@ namespace GMF
 
         private IEnumerator RoundTimerRoutine()
         {
-            float total = _def.RoundConfig.RoundDuration;
+            float total   = _def.RoundConfig.RoundDuration;
             float elapsed = 0f;
 
             while (elapsed < total)
@@ -250,7 +288,6 @@ namespace GMF
 
             yield return new WaitForSeconds(_def.RoundConfig.RoundEndDuration);
 
-            // Contar victorias de ronda
             if (winnerTeamID >= 0)
             {
                 _roundWins.TryGetValue(winnerTeamID, out int w);
@@ -290,9 +327,7 @@ namespace GMF
         }
 
         private void OnObjectiveReset(ObjectiveResetEvt e)
-        {
-            _ctx._objectives.Get(e.ObjectiveID)?.Reset();
-        }
+            => _ctx._objectives.Get(e.ObjectiveID)?.Reset();
 
         // ── Helpers ───────────────────────────────────────────
 

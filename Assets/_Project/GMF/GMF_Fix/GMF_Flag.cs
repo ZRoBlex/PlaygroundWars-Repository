@@ -2,10 +2,9 @@
 // ║  ARCHIVO: GMF_Flag.cs  (REEMPLAZA el anterior)           ║
 // ║                                                          ║
 // ║  CAMBIOS:                                                ║
-// ║    - GetPlayerTeam ahora usa GameModeBase.Instance       ║
-// ║      (era FindFirstObjectByType → no encontraba inactivo)║
-// ║    + Al recoger/soltar, actualiza FlagCarrierBridge      ║
-// ║      del portador para que CaptureZone pueda detectarlo  ║
+// ║    + El jugador puede soltar la bandera con "G" (config) ║
+// ║      FlagDropInput.cs se añade al prefab del jugador     ║
+// ║    + Método público DropByPlayer() para input externo    ║
 // ╚══════════════════════════════════════════════════════════╝
 
 using System.Collections;
@@ -17,10 +16,7 @@ namespace GMF
     [RequireComponent(typeof(Collider))]
     public class Flag : ObjectiveBase
     {
-        // ── Inspector ─────────────────────────────────────────
-
         [Header("Flag Settings")]
-        [Tooltip("Segundos hasta retorno automático cuando está caída.")]
         [SerializeField] private float _autoReturnTime = 15f;
 
         [Header("Visuals")]
@@ -31,13 +27,14 @@ namespace GMF
 
         private Vector3    _homePos;
         private Quaternion _homeRot;
-        private Transform  _carrierTransform;
+        // private Transform  _carrierTransform;
+        private Transform _followTarget;
         private int        _carrierID   = -1;
         private int        _carrierTeam = -1;
         private Coroutine  _returnTimer;
 
         public int  CarrierID      => _carrierID;
-        public bool IsBeingCarried => _carrierTransform != null;
+        public bool IsBeingCarried => _followTarget != null;
 
         // ── Lifecycle ─────────────────────────────────────────
 
@@ -50,11 +47,14 @@ namespace GMF
             UpdateVisuals();
         }
 
-        // UPDATE JUSTIFICADO: seguir al portador en tiempo real.
         private void Update()
         {
-            if (!IsBeingCarried || _carrierTransform == null) return;
-            transform.position = _carrierTransform.position + Vector3.up * 1.8f;
+            // if (!IsBeingCarried || _followTarget == null) return;
+            // transform.position = _followTarget.position + Vector3.up * 1.8f;
+            if (!IsBeingCarried || _followTarget == null) return;
+
+            transform.position = _followTarget.position;
+            transform.rotation = _followTarget.rotation;
         }
 
         // ── Trigger ───────────────────────────────────────────
@@ -67,31 +67,52 @@ namespace GMF
             HandleContact(auth);
         }
 
+        // private void HandleContact(PlayerAuthority auth)
+        // {
+        //     int pid   = auth.PlayerID;
+        //     int pTeam = GetPlayerTeam(pid);
+        //     if (pTeam < 0) return;
+
+        //     if (State == "Idle" && pTeam != _teamID)
+        //         DoPickUp(pid, auth.transform, pTeam);
+        //     else if (State == "Dropped" && pTeam == _teamID)
+        //         DoReturn(pid);
+        // }
         private void HandleContact(PlayerAuthority auth)
         {
             int pid   = auth.PlayerID;
             int pTeam = GetPlayerTeam(pid);
-            if (pTeam < 0) return; // equipo no asignado aún
+            if (pTeam < 0) return;
 
             if (State == "Idle" && pTeam != _teamID)
             {
-                // Equipo enemigo → recoger
-                DoPickUp(pid, auth.transform, pTeam, auth);
+                DoPickUp(pid, auth.transform, pTeam);
             }
-            else if (State == "Dropped" && pTeam == _teamID)
+            else if (State == "Dropped")
             {
-                // Equipo dueño → devolver
-                DoReturn(pid);
+                if (pTeam == _teamID)
+                    DoReturn(pid);     // aliados devuelven
+                else
+                    DoPickUp(pid, auth.transform, pTeam); // enemigos recogen
             }
         }
 
         // ── Acciones públicas ─────────────────────────────────
 
-        public void PickUp(int playerID, Transform carrier, int playerTeam, PlayerAuthority auth = null)
-            => DoPickUp(playerID, carrier, playerTeam, auth);
+        public void PickUp(int pid, Transform carrier, int team)
+            => DoPickUp(pid, carrier, team);
 
-        public void Drop(int playerID)
-            => DoDrop(playerID);
+        public void Drop(int pid) => DoDrop(pid);
+
+        /// <summary>
+        /// El jugador presionó la tecla de soltar bandera.
+        /// Solo funciona si este jugador la está portando.
+        /// </summary>
+        public void DropByPlayer(int playerID)
+        {
+            if (State != "Carried" || _carrierID != playerID) return;
+            DoDrop(playerID);
+        }
 
         public void Capture(int playerID, int playerTeam)
         {
@@ -101,24 +122,30 @@ namespace GMF
             DoReturn(-1);
         }
 
-        public void ReturnToBase(int returnedByID = -1)
-            => DoReturn(returnedByID);
+        public void ReturnToBase(int returnedByID = -1) => DoReturn(returnedByID);
 
         // ── Implementación ────────────────────────────────────
 
-        private void DoPickUp(int pid, Transform carrier, int pTeam, PlayerAuthority auth = null)
+        private void DoPickUp(int pid, Transform carrier, int pTeam)
         {
             StopTimer();
-            _carrierTransform = carrier;
+            _followTarget = carrier;
             _carrierID        = pid;
             _carrierTeam      = pTeam;
             State             = "Carried";
             UpdateVisuals();
 
-            // Actualizar FlagCarrierBridge del portador
+            // var bridge = carrier.GetComponent<FlagCarrierBridge>()
+            //           ?? carrier.GetComponentInChildren<FlagCarrierBridge>();
+            // bridge?.SetCarrying(this);
             var bridge = carrier.GetComponent<FlagCarrierBridge>()
-                      ?? carrier.GetComponentInChildren<FlagCarrierBridge>();
-            bridge?.SetCarrying(this);
+            ?? carrier.GetComponentInChildren<FlagCarrierBridge>();
+
+            _followTarget = bridge != null && bridge.CarryPoint != null
+                ? bridge.CarryPoint
+                : carrier; // fallback si no hay carry point
+
+                bridge?.SetCarrying(this);
 
             EmitInteraction("Pickup", pid, pTeam);
         }
@@ -128,7 +155,7 @@ namespace GMF
             if (State != "Carried") return;
             ClearCarrierBridge();
             int dropTeam      = _carrierTeam;
-            _carrierTransform = null;
+            _followTarget = null;
             _carrierID        = -1;
             _carrierTeam      = -1;
             State             = "Dropped";
@@ -141,7 +168,7 @@ namespace GMF
         {
             StopTimer();
             ClearCarrierBridge();
-            _carrierTransform = null;
+            _followTarget = null;
             _carrierID        = -1;
             _carrierTeam      = -1;
             transform.SetPositionAndRotation(_homePos, _homeRot);
@@ -153,13 +180,11 @@ namespace GMF
 
         private void ClearCarrierBridge()
         {
-            if (_carrierTransform == null) return;
-            var bridge = _carrierTransform.GetComponent<FlagCarrierBridge>()
-                      ?? _carrierTransform.GetComponentInChildren<FlagCarrierBridge>();
-            bridge?.ClearCarrying();
+            if (_followTarget == null) return;
+            var b = _followTarget.GetComponent<FlagCarrierBridge>()
+                 ?? _followTarget.GetComponentInChildren<FlagCarrierBridge>();
+            b?.ClearCarrying();
         }
-
-        // ── Timer ─────────────────────────────────────────────
 
         private void StartTimer()
         {
@@ -178,21 +203,16 @@ namespace GMF
             DoReturn(-1);
         }
 
-        // ── IObjective ────────────────────────────────────────
-
         public override void Reset()
         {
             StopTimer();
             ClearCarrierBridge();
-            _carrierTransform = null;
-            _carrierID        = -1;
-            _carrierTeam      = -1;
+            _followTarget = null;
+            _carrierID = _carrierTeam = -1;
             transform.SetPositionAndRotation(_homePos, _homeRot);
             State = "Idle";
             UpdateVisuals();
         }
-
-        // ── Helpers ───────────────────────────────────────────
 
         private void UpdateVisuals()
         {
@@ -200,14 +220,12 @@ namespace GMF
             if (_baseIndicator != null) _baseIndicator.SetActive(State == "Idle");
         }
 
-        // ✅ FIX: usa Instance estático en lugar de FindFirstObjectByType
         private int GetPlayerTeam(int pid)
             => GameModeBase.Instance?.Context?.Teams?.GetTeam(pid) ?? -1;
 
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = State == "Idle"    ? Color.green  :
-                           State == "Carried" ? Color.yellow : Color.red;
+            Gizmos.color = State == "Idle" ? Color.green : State == "Carried" ? Color.yellow : Color.red;
             Gizmos.DrawWireSphere(transform.position, 0.5f);
         }
     }

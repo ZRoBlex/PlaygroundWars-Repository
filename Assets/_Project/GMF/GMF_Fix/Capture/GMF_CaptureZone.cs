@@ -1,18 +1,18 @@
 // ╔══════════════════════════════════════════════════════════╗
-// ║  ARCHIVO: GMF_CaptureZone.cs                            ║
+// ║  ARCHIVO: GMF_Zones.cs  (REEMPLAZA el anterior)          ║
 // ║                                                          ║
-// ║  CLASE INCLUIDA:                                         ║
-// ║    • CaptureZone      (MonoBehaviour)                    ║
+// ║  CLASES:                                                 ║
+// ║    • FlagCarrierBridge  ← añadir al prefab del jugador   ║
+// ║    • CaptureZone        ← añadir a las bases             ║
+// ║    • ControlPoint       ← añadir a puntos de control     ║
 // ║                                                          ║
-// ║  USO:                                                    ║
-// ║    GMF_CaptureZone.cs      → se añade a GameObject zona  ║
+// ║  ⚠️ SEPARAR: un archivo por clase (mismo namespace GMF) ║
 // ║                                                          ║
-// ║  CAMBIOS:                                                ║
-// ║    + CaptureZone valida que el jugador lleve una bandera  ║
-// ║      enemiga ANTES de emitir "Capture"                   ║
-// ║    + El evento incluye CarriedObjectiveID                 ║
-// ║      (ObjectiveCaptureRule lo usa para resetear la flag)  ║
-// ║    - GetPlayerTeam usa GameModeBase.Instance              ║
+// ║  FIX PRINCIPAL:                                          ║
+// ║    CaptureZone ya NO requiere FlagCarrierBridge.         ║
+// ║    Consulta la lista de flags en ObjectiveRegistry para  ║
+// ║    saber si el jugador porta una bandera enemiga.        ║
+// ║    Así funciona aunque el jugador no tenga el bridge.    ║
 // ╚══════════════════════════════════════════════════════════╝
 
 using System.Collections.Generic;
@@ -24,9 +24,8 @@ namespace GMF
 {
     // ════════════════════════════════════════════════════════
     //  CAPTURE ZONE
-    //  ► Añadir al GameObject de cada base
-    //  ► TeamID = 0 → base del equipo Red; TeamID = 1 → Blue
-    //  ► Asegurar Collider con isTrigger = true
+    //  ► Cuando el jugador entra, verifica en el registro si
+    //    porta una bandera enemiga → emite "Capture"
     // ════════════════════════════════════════════════════════
 
     [RequireComponent(typeof(Collider))]
@@ -49,25 +48,17 @@ namespace GMF
             int pTeam = GetPlayerTeam(pid);
             if (pTeam < 0) return;
 
-            // ── Solo emitir "Capture" si se cumplen las 3 condiciones ──
-            //  1. El jugador está en SU propia base (misma TeamID que la zona)
-            //  2. El jugador lleva una bandera
-            //  3. La bandera es del equipo ENEMIGO
+            // ✅ Buscar si este jugador porta alguna bandera enemiga
+            // Consulta el registro — no necesita FlagCarrierBridge
+            Flag carriedEnemyFlag = FindCarriedEnemyFlag(pid, pTeam);
 
-            var bridge = other.GetComponentInParent<FlagCarrierBridge>();
-
-            if (pTeam == _teamID                              // 1. base propia
-                && bridge != null && bridge.IsCarrying        // 2. lleva algo
-                && bridge.CarriedFlag != null                 // 3a. hay flag
-                && bridge.CarriedFlag.TeamID != pTeam)        // 3b. flag enemiga
+            if (pTeam == _teamID && carriedEnemyFlag != null)
             {
-                // ✅ Captura válida — incluimos el ID de la bandera en el evento
-                // para que ObjectiveCaptureRule pueda resetearla
-                EmitInteractionWithCarried("Capture", pid, pTeam, bridge.CarriedObjectiveID);
+                // ✅ Captura válida: jugador en su base portando bandera enemiga
+                EmitInteractionWithCarried("Capture", pid, pTeam, carriedEnemyFlag.ObjectiveID);
             }
             else
             {
-                // Solo "Enter" para otros efectos / reglas futuras
                 EmitInteraction("Enter", pid, pTeam);
             }
         }
@@ -82,10 +73,30 @@ namespace GMF
 
         public override void Reset() { State = "Idle"; }
 
-        // ── Helper: emite el evento con CarriedObjectiveID ────
+        // ── Busca en el registro una bandera portada por este jugador ─
+
+        private Flag FindCarriedEnemyFlag(int playerID, int playerTeamID)
+        {
+            var gm = GameModeBase.Instance;
+            if (gm?.Context?.Objectives == null) return null;
+
+            var objs = gm.Context.Objectives.GetAll();
+            foreach (var obj in objs)
+            {
+                var flag = obj as Flag;
+                if (flag == null) continue;
+                if (!flag.IsBeingCarried) continue;
+                if (flag.CarrierID != playerID) continue;
+                if (flag.TeamID == playerTeamID) continue; // es su propia bandera
+                return flag; // bandera enemiga portada por este jugador
+            }
+            return null;
+        }
+
+        // ── Emitir con ID de bandera ──────────────────────────
 
         private void EmitInteractionWithCarried(
-            string interaction, int playerID, int playerTeamID, string carriedObjectiveID)
+            string interaction, int playerID, int playerTeamID, string carriedID)
         {
             if (!IsActive) return;
 
@@ -97,7 +108,7 @@ namespace GMF
                 PlayerTeamID       = playerTeamID,
                 ObjectiveTeamID    = _teamID,
                 Position           = transform.position,
-                CarriedObjectiveID = carriedObjectiveID
+                CarriedObjectiveID = carriedID
             });
         }
 
@@ -107,9 +118,11 @@ namespace GMF
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = _teamID == 0
-                ? new Color(1f, 0.2f, 0.2f, 0.3f)
-                : new Color(0.2f, 0.2f, 1f, 0.3f);
+                ? new Color(1f, 0.2f, 0.2f, 0.5f)
+                : new Color(0.2f, 0.2f, 1f, 0.5f);
             Gizmos.DrawCube(transform.position, transform.localScale);
+            Gizmos.color = _teamID == 0 ? Color.red : Color.blue;
+            Gizmos.DrawWireCube(transform.position, transform.localScale);
         }
     }
 }
