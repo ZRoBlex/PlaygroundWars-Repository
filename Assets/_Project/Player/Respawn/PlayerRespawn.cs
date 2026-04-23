@@ -1,23 +1,19 @@
-// ============================================================
-//  PlayerRespawn.cs
-//  PlayerSystem/Respawn/PlayerRespawn.cs
-//
-//  RESPONSABILIDAD ÚNICA: Manejar el respawn del jugador.
-//
-//  CARACTERÍSTICAS:
-//  • Delay configurable antes del respawn
-//  • Pool de spawn points con selección aleatoria
-//  • Integración con GameMode (spawn points externos)
-//  • Reset completo de estado del jugador al respawn
-//  • Deshabilita sistemas durante el tiempo de muerte
-//  • Solo la autoridad decide cuándo y dónde hacer respawn
-//  • Soporte para AllowRespawn=false (GameOver permanente)
-// ============================================================
+// ╔══════════════════════════════════════════════════════════╗
+// ║  ARCHIVO: PlayerRespawn.cs  (REEMPLAZA el anterior)      ║
+// ║                                                          ║
+// ║  CAMBIOS vs versión anterior:                            ║
+// ║    + Busca GMFSpawnArea del equipo del jugador           ║
+// ║    + Llama TryGetSpawnPosition() para zona libre         ║
+// ║    + ResetFull() para cambio de equipo (sin kill)        ║
+// ║    + ForceRespawnSilent() — respawn sin PlayerDiedEvent  ║
+// ║      (usado por GameModeBase en warm-up)                 ║
+// ╚══════════════════════════════════════════════════════════╝
 
 using System.Collections;
 using System.Collections.Generic;
 using Core.Debug;
 using Core.Events;
+using GMF;
 using Player.Authority;
 using Player.Config;
 using Player.Events;
@@ -37,29 +33,28 @@ namespace Player.Respawn
         [Header("Configuración")]
         [SerializeField] private PlayerConfig _config;
 
-        [Header("Spawn Points")]
-        [Tooltip("Lista de posibles spawn points. Si está vacía, usa la posición inicial.")]
-        [SerializeField] private List<Transform> _spawnPoints = new();
+        [Header("Spawn Points fallback")]
+        [Tooltip("Solo se usan si no hay GMFSpawnArea en la escena.")]
+        [SerializeField] private List<Transform> _fallbackSpawnPoints = new();
 
         [Header("Visuals")]
-        [Tooltip("Raíz del mesh del jugador para ocultar durante la muerte.")]
         [SerializeField] private GameObject _playerVisuals;
 
         // ── Referencias ───────────────────────────────────────
 
-        private PlayerAuthority      _authority;
-        private PlayerHealth         _health;
-        private PlayerMovement_Fixed       _movement;
-        private PlayerCameraController _camera;
+        private PlayerAuthority         _authority;
+        private PlayerHealth            _health;
+        private PlayerMovement_Fixed    _movement;
+        private PlayerCameraController  _camera;
 
         // ── Estado ────────────────────────────────────────────
 
-        public bool IsRespawning    { get; private set; }
-        public int  RespawnCount    { get; private set; }
+        public bool IsRespawning { get; private set; }
+        public int  RespawnCount { get; private set; }
 
-        private Vector3    _defaultSpawnPosition;
-        private Quaternion _defaultSpawnRotation;
-        private Coroutine  _respawnCoroutine;
+        private Vector3    _defaultPos;
+        private Quaternion _defaultRot;
+        private Coroutine  _respawnCoro;
 
         // ── Lifecycle ─────────────────────────────────────────
 
@@ -70,8 +65,8 @@ namespace Player.Respawn
             _movement  = GetComponent<PlayerMovement_Fixed>();
             _camera    = GetComponent<PlayerCameraController>();
 
-            _defaultSpawnPosition = transform.position;
-            _defaultSpawnRotation = transform.rotation;
+            _defaultPos = transform.position;
+            _defaultRot = transform.rotation;
         }
 
         private void OnEnable()
@@ -82,196 +77,197 @@ namespace Player.Respawn
         private void OnDisable()
         {
             EventBus<PlayerDiedEvent>.Unsubscribe(OnPlayerDied);
-
-            if (_respawnCoroutine != null)
-                StopCoroutine(_respawnCoroutine);
+            if (_respawnCoro != null) StopCoroutine(_respawnCoro);
         }
 
-        // ── Callbacks de eventos ──────────────────────────────
+        // ── Muerte normal ─────────────────────────────────────
 
         private void OnPlayerDied(PlayerDiedEvent e)
         {
             if (e.PlayerID != _authority.PlayerID) return;
-
-            // Solo la autoridad gestiona el respawn
             if (!_authority.HasAuthority) return;
 
-            HandleDeath();
-        }
-
-        // ── Muerte ────────────────────────────────────────────
-
-        private void HandleDeath()
-        {
-            CoreLogger.LogSystem("PlayerRespawn", $"[P{_authority.PlayerID}] Jugador muerto.");
-
-            // Deshabilitar sistemas durante la muerte
-            DisablePlayerSystems();
+            DisableSystems();
 
             if (_config != null && _config.AllowRespawn)
-                _respawnCoroutine = StartCoroutine(RespawnRoutine());
-            else
-                CoreLogger.LogSystem("PlayerRespawn",
-                    $"[P{_authority.PlayerID}] AllowRespawn=false. Sin respawn."
-                );
+                _respawnCoro = StartCoroutine(RespawnAfterDelay(_config.RespawnDelay));
         }
 
-        // ── Coroutine de respawn ──────────────────────────────
-
-        private IEnumerator RespawnRoutine()
+        private IEnumerator RespawnAfterDelay(float delay)
         {
             IsRespawning = true;
-            float delay  = _config != null ? _config.RespawnDelay : 3f;
 
-            Vector3    spawnPos = GetSpawnPosition();
-            Quaternion spawnRot = GetSpawnRotation();
-
-            // Notificar que el respawn está por ocurrir
             EventBus<PlayerPreRespawnEvent>.Raise(new PlayerPreRespawnEvent
             {
                 PlayerID      = _authority.PlayerID,
-                SpawnPosition = spawnPos,
+                SpawnPosition = GetSpawnPosition(),
                 Delay         = delay
             });
 
-            CoreLogger.LogSystem("PlayerRespawn",
-                $"[P{_authority.PlayerID}] Respawn en {delay}s en {spawnPos}"
-            );
-
             yield return new WaitForSeconds(delay);
 
-            ExecuteRespawn(spawnPos, spawnRot);
+            DoRespawn(GetSpawnPosition(), GetSpawnRotation(), countRespawn: true);
         }
 
-        // ── Ejecutar respawn ──────────────────────────────────
+        // ── Respawn silencioso (warm-up / cambio de equipo) ───
 
-        private void ExecuteRespawn(Vector3 position, Quaternion rotation)
+        /// <summary>
+        /// Respawnea SIN emitir PlayerDiedEvent ni contar como muerte.
+        /// Usado por GameModeBase al inicio de cada ronda.
+        /// </summary>
+        public void ForceRespawnSilent()
         {
-            // Reset de salud
-            if (_config != null && _config.ResetHealthOnRespawn)
-                _health?.ResetHealth();
+            if (_respawnCoro != null) StopCoroutine(_respawnCoro);
+            DisableSystems();
+            DoRespawn(GetSpawnPosition(), GetSpawnRotation(), countRespawn: false);
+        }
 
-            // Teleport
-            _movement?.Teleport(position, rotation);
+        /// <summary>Respawnea en posición específica sin contar como muerte.</summary>
+        public void ForceRespawnAt(Vector3 pos, Quaternion rot, bool silent = true)
+        {
+            if (_respawnCoro != null) StopCoroutine(_respawnCoro);
+            DisableSystems();
+            DoRespawn(pos, rot, countRespawn: !silent);
+        }
 
-            // Cámara
-            _camera?.SetRotation(rotation.eulerAngles.y);
+        public void ForceRespawn()
+        {
+            if (_respawnCoro != null) StopCoroutine(_respawnCoro);
+            DoRespawn(GetSpawnPosition(), GetSpawnRotation(), countRespawn: true);
+        }
 
-            // Re-habilitar sistemas
-            EnablePlayerSystems();
-
-            RespawnCount++;
+        /// <summary>
+        /// Reset completo al cambiar de equipo.
+        /// Restaura HP, movimiento, etc. sin contar muerte.
+        /// </summary>
+        public void ResetFull(Vector3 spawnPos, Quaternion spawnRot)
+        {
+            if (_respawnCoro != null) StopCoroutine(_respawnCoro);
             IsRespawning = false;
 
+            // Reset salud al máximo
+            _health?.ResetHealth();
+
+            // Teleport
+            _movement?.Teleport(spawnPos, spawnRot);
+            _camera?.SetRotation(spawnRot.eulerAngles.y);
+
+            EnableSystems();
+
             CoreLogger.LogSystem("PlayerRespawn",
-                $"[P{_authority.PlayerID}] Respawn #{RespawnCount} completado en {position}"
-            );
+                $"[P{_authority.PlayerID}] ResetFull (cambio de equipo)");
 
             EventBus<PlayerRespawnedEvent>.Raise(new PlayerRespawnedEvent
             {
                 PlayerID      = _authority.PlayerID,
-                SpawnPosition = position
+                SpawnPosition = spawnPos
             });
         }
 
-        // ── Spawn Points ──────────────────────────────────────
+        // ── Ejecución real ────────────────────────────────────
+
+        private void DoRespawn(Vector3 pos, Quaternion rot, bool countRespawn)
+        {
+            if (_config != null && _config.ResetHealthOnRespawn)
+                _health?.ResetHealth();
+
+            _movement?.Teleport(pos, rot);
+            _camera?.SetRotation(rot.eulerAngles.y);
+
+            EnableSystems();
+
+            if (countRespawn) RespawnCount++;
+            IsRespawning = false;
+
+            CoreLogger.LogSystem("PlayerRespawn",
+                $"[P{_authority.PlayerID}] Respawn #{RespawnCount} en {pos}");
+
+            EventBus<PlayerRespawnedEvent>.Raise(new PlayerRespawnedEvent
+            {
+                PlayerID      = _authority.PlayerID,
+                SpawnPosition = pos
+            });
+        }
+
+        // ── Obtener posición de spawn ─────────────────────────
 
         private Vector3 GetSpawnPosition()
         {
-            if (_spawnPoints == null || _spawnPoints.Count == 0)
-                return _defaultSpawnPosition;
+            // 1. Buscar GMFSpawnArea del equipo
+            var gm = GameModeBase.Instance;
+            if (gm != null)
+            {
+                int teamID = gm.Context?.Teams?.GetTeam(_authority.PlayerID) ?? -1;
+                if (teamID >= 0)
+                {
+                    var areas = FindObjectsByType<GMFSpawnArea>(
+                        FindObjectsInactive.Exclude, FindObjectsSortMode.None);
 
-            // Eliminar nulls
-            _spawnPoints.RemoveAll(sp => sp == null);
-            if (_spawnPoints.Count == 0)
-                return _defaultSpawnPosition;
+                    foreach (var area in areas)
+                    {
+                        if (area.TeamID != teamID) continue;
+                        if (area.TryGetSpawnPosition(out Vector3 p)) return p;
+                    }
+                }
+            }
 
-            return _spawnPoints[Random.Range(0, _spawnPoints.Count)].position;
+            // 2. Fallback: spawn points manuales
+            if (_fallbackSpawnPoints?.Count > 0)
+            {
+                _fallbackSpawnPoints.RemoveAll(sp => sp == null);
+                if (_fallbackSpawnPoints.Count > 0)
+                    return _fallbackSpawnPoints[Random.Range(0, _fallbackSpawnPoints.Count)].position;
+            }
+
+            // 3. Último fallback: posición de inicio
+            return _defaultPos;
         }
 
         private Quaternion GetSpawnRotation()
         {
-            if (_spawnPoints == null || _spawnPoints.Count == 0)
-                return _defaultSpawnRotation;
+            var gm = GameModeBase.Instance;
+            if (gm != null)
+            {
+                int teamID = gm.Context?.Teams?.GetTeam(_authority.PlayerID) ?? -1;
+                if (teamID >= 0)
+                {
+                    var areas = FindObjectsByType<GMFSpawnArea>(
+                        FindObjectsInactive.Exclude, FindObjectsSortMode.None);
 
-            // Toma la rotación del spawn point seleccionado (simplificado)
-            return _spawnPoints[0].rotation;
-        }
-
-        /// <summary>
-        /// Registra spawn points en runtime (ej: los manda el GameMode).
-        /// </summary>
-        public void SetSpawnPoints(List<Transform> points)
-        {
-            _spawnPoints = points ?? new List<Transform>();
-            CoreLogger.LogSystemDebug("PlayerRespawn",
-                $"[P{_authority.PlayerID}] SpawnPoints actualizados: {_spawnPoints.Count}"
-            );
-        }
-
-        /// <summary>Añade un spawn point dinámicamente.</summary>
-        public void AddSpawnPoint(Transform point)
-        {
-            if (point != null)
-                _spawnPoints.Add(point);
+                    foreach (var area in areas)
+                        if (area.TeamID == teamID)
+                            return area.transform.rotation;
+                }
+            }
+            return _defaultRot;
         }
 
         // ── Sistemas ──────────────────────────────────────────
 
-        private void DisablePlayerSystems()
+        private void DisableSystems()
         {
-            // Visuals
-            if (_playerVisuals != null)
-                _playerVisuals.SetActive(false);
-
-            // Input → no puede controlar durante muerte
-            var input = GetComponent<Player.Input.PlayerInput>();
-            input?.DisableInput();
-
-            // Collider
+            if (_playerVisuals != null) _playerVisuals.SetActive(false);
+            GetComponent<Player.Input.PlayerInput>()?.DisableInput();
             var cc = GetComponent<CharacterController>();
             if (cc != null) cc.enabled = false;
-
-            CoreLogger.LogSystemDebug("PlayerRespawn", $"[P{_authority.PlayerID}] Sistemas deshabilitados.");
         }
 
-        private void EnablePlayerSystems()
+        private void EnableSystems()
         {
-            if (_playerVisuals != null)
-                _playerVisuals.SetActive(true);
-
-            var input = GetComponent<Player.Input.PlayerInput>();
-            input?.EnableInput();
-
+            if (_playerVisuals != null) _playerVisuals.SetActive(true);
+            GetComponent<Player.Input.PlayerInput>()?.EnableInput();
             var cc = GetComponent<CharacterController>();
             if (cc != null) cc.enabled = true;
-
-            CoreLogger.LogSystemDebug("PlayerRespawn", $"[P{_authority.PlayerID}] Sistemas habilitados.");
         }
 
-        // ── API Pública ───────────────────────────────────────
+        // ── API heredada ──────────────────────────────────────
 
-        /// <summary>
-        /// Fuerza un respawn inmediato en la posición actual.
-        /// Útil para editor tools o comandos de debug.
-        /// </summary>
-        public void ForceRespawn()
+        public void SetSpawnPoints(List<Transform> pts)
+            => _fallbackSpawnPoints = pts ?? new List<Transform>();
+
+        public void AddSpawnPoint(Transform pt)
         {
-            if (_respawnCoroutine != null)
-                StopCoroutine(_respawnCoroutine);
-
-            ExecuteRespawn(GetSpawnPosition(), GetSpawnRotation());
-        }
-
-        /// <summary>
-        /// Fuerza un respawn en una posición específica.
-        /// </summary>
-        public void ForceRespawnAt(Vector3 position, Quaternion rotation)
-        {
-            if (_respawnCoroutine != null)
-                StopCoroutine(_respawnCoroutine);
-
-            ExecuteRespawn(position, rotation);
+            if (pt != null) _fallbackSpawnPoints.Add(pt);
         }
     }
 }

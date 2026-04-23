@@ -631,6 +631,8 @@ Transform:
   m_Children:
   - {fileID: 529405777}
   - {fileID: 2051966648}
+  - {fileID: 1337552467}
+  - {fileID: 1068385305}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &493346994
@@ -2611,6 +2613,7 @@ GameObject:
   - component: {fileID: 529405774}
   - component: {fileID: 529405778}
   - component: {fileID: 529405779}
+  - component: {fileID: 529405780}
   m_Layer: 0
   m_Name: Zone A
   m_TagString: Untagged
@@ -2742,6 +2745,26 @@ MonoBehaviour:
   _teamID: 1
   _startsActive: 1
   _tickInterval: 1
+--- !u!114 &529405780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 529405773}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8eb70f98af62c964d90e905f3491c04c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GMF.GMFSpawnArea
+  TeamID: 1
+  _checkRadius: 0.4
+  _checkHeight: 1.8
+  _blockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  _maxAttempts: 30
+  _drawGizmos: 1
 --- !u!1 &543869326
 GameObject:
   m_ObjectHideFlags: 0
@@ -3377,6 +3400,172 @@ Transform:
   m_Children: []
   m_Father: {fileID: 314480611}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1068385304
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1068385305}
+  - component: {fileID: 1068385311}
+  - component: {fileID: 1068385310}
+  - component: {fileID: 1068385309}
+  - component: {fileID: 1068385308}
+  - component: {fileID: 1068385307}
+  - component: {fileID: 1068385306}
+  m_Layer: 0
+  m_Name: Zone B_Spawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1068385305
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068385304}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 25, y: 5, z: 0}
+  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 421648704}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1068385306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068385304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8eb70f98af62c964d90e905f3491c04c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GMF.GMFSpawnArea
+  TeamID: 0
+  _checkRadius: 0.4
+  _checkHeight: 1.8
+  _blockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  _maxAttempts: 30
+  _drawGizmos: 1
+--- !u!114 &1068385307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068385304}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43888159556af9d41bdf5a5a58e863b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GMF.ControlPoint
+  _objectiveID: base_blue
+  _teamID: 0
+  _startsActive: 1
+  _tickInterval: 1
+--- !u!114 &1068385308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068385304}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d2a3ed224ae6c1448b38b980b9abf05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GMF.CaptureZone
+  _objectiveID: base_blue
+  _teamID: 0
+  _startsActive: 1
+--- !u!65 &1068385309
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068385304}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1068385310
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068385304}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 7f472f15b7abc0f4f81d9b033dc10f97, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1068385311
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068385304}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &1112495548
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3434,6 +3623,172 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8069cce1113bcfe40b194cd1782a4e64, type: 3}
+--- !u!1 &1337552466
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1337552467}
+  - component: {fileID: 1337552473}
+  - component: {fileID: 1337552472}
+  - component: {fileID: 1337552471}
+  - component: {fileID: 1337552470}
+  - component: {fileID: 1337552469}
+  - component: {fileID: 1337552468}
+  m_Layer: 0
+  m_Name: Zone A_Spawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1337552467
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1337552466}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -25, y: 5, z: 0}
+  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 421648704}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1337552468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1337552466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8eb70f98af62c964d90e905f3491c04c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GMF.GMFSpawnArea
+  TeamID: 1
+  _checkRadius: 0.4
+  _checkHeight: 1.8
+  _blockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  _maxAttempts: 30
+  _drawGizmos: 1
+--- !u!114 &1337552469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1337552466}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43888159556af9d41bdf5a5a58e863b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GMF.ControlPoint
+  _objectiveID: base_red
+  _teamID: 1
+  _startsActive: 1
+  _tickInterval: 1
+--- !u!114 &1337552470
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1337552466}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d2a3ed224ae6c1448b38b980b9abf05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GMF.CaptureZone
+  _objectiveID: base_red
+  _teamID: 1
+  _startsActive: 1
+--- !u!65 &1337552471
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1337552466}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1337552472
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1337552466}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 3c3cb01eb19d9024989a59d75b4ec697, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1337552473
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1337552466}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1343611034
 GameObject:
   m_ObjectHideFlags: 0
@@ -3561,6 +3916,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GMF.GameModeBase
   _def: {fileID: 11400000, guid: 10bfd9bff78e5d54090820c59248b5ab, type: 2}
   _isAuthority: 1
+  _spawnAreas: []
+  _roundStartObjects: []
 --- !u!4 &1383373477
 Transform:
   m_ObjectHideFlags: 0
@@ -3593,13 +3950,15 @@ MonoBehaviour:
   _displayTime: 3.5
   _slideOutTime: 0.35
   _bannerHeight: 90
-  _yPosition: 0.35
-  _overWidth: 120
-  _bannerColor: {r: 0.08, g: 0.08, b: 0.12, a: 0.97}
-  _accentColor: {r: 1, g: 0.85, b: 0.2, a: 1}
-  _accentHeight: 5
-  _tablePadding: 8
-  _tableRowHeight: 22
+  _bannerY: 0.3
+  _tableRowH: 24
+  _tableColName: 200
+  _tableColRounds: 100
+  _tableColScore: 100
+  _tableColKills: 100
+  _bannerBg: {r: 0.07, g: 0.07, b: 0.11, a: 0.97}
+  _accentGold: {r: 1, g: 0.82, b: 0.2, a: 1}
+  _endGameBg: {r: 0.04, g: 0.04, b: 0.08, a: 0.98}
 --- !u!1 &1611145144
 GameObject:
   m_ObjectHideFlags: 0
@@ -4190,6 +4549,7 @@ GameObject:
   - component: {fileID: 2051966645}
   - component: {fileID: 2051966649}
   - component: {fileID: 2051966650}
+  - component: {fileID: 2051966651}
   m_Layer: 0
   m_Name: Zone B
   m_TagString: Untagged
@@ -4321,6 +4681,26 @@ MonoBehaviour:
   _teamID: 0
   _startsActive: 1
   _tickInterval: 1
+--- !u!114 &2051966651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2051966644}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8eb70f98af62c964d90e905f3491c04c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GMF.GMFSpawnArea
+  TeamID: 0
+  _checkRadius: 0.4
+  _checkHeight: 1.8
+  _blockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  _maxAttempts: 30
+  _drawGizmos: 1
 --- !u!1 &2143961167
 GameObject:
   m_ObjectHideFlags: 0
