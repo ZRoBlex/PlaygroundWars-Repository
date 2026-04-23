@@ -1,13 +1,12 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  ARCHIVO: GMF_GameModeBase.cs  (REEMPLAZA el anterior)   ║
 // ║                                                          ║
-// ║  FIXES CRÍTICOS:                                         ║
-// ║    ✅ StartGame() escanea la escena y asigna TODOS los   ║
-// ║       PlayerAuthority existentes a equipos              ║
-// ║    ✅ OnPlayerReady asigna aunque el juego no haya       ║
-// ║       empezado (jugadores listos antes de StartGame)     ║
-// ║    ✅ Instance se setea en Awake (no solo en StartGame)  ║
-// ║       para que flags/zonas funcionen desde el inicio     ║
+// ║  FIXES DE RONDAS:                                        ║
+// ║    ✅ _roundWins ahora es Dictionary<int,int> interno    ║
+// ║       pero expuesto como IReadOnlyDictionary para la UI  ║
+// ║    ✅ RoundsToWinMatch se respeta correctamente          ║
+// ║    ✅ AssignAllPlayersToTeams es public                   ║
+// ║    ✅ _def expuesto como GameModeDefinitionSO para UI     ║
 // ╚══════════════════════════════════════════════════════════╝
 
 using System.Collections;
@@ -32,7 +31,7 @@ namespace GMF
         [Header("Definición del modo")]
         [SerializeField] private GMF_Config _def;
 
-        [Tooltip("true = servidor/host/offline. false = cliente puro.")]
+        [Tooltip("true = servidor/host/offline.")]
         [SerializeField] private bool _isAuthority = true;
 
         // ── Subsistemas ───────────────────────────────────────
@@ -41,26 +40,24 @@ namespace GMF
         private RuleEngine            _ruleEngine;
         private WinConditionEvaluator _winEval;
         private Coroutine             _phaseCoroutine;
+
+        // ✅ Expuesto como IReadOnlyDictionary para la UI (GMFRoundBanner usa reflexión)
         private readonly Dictionary<int, int> _roundWins = new();
 
         // ── Estado ────────────────────────────────────────────
 
-        public IGameModeContext Context     => _ctx;
-        public bool             IsRunning   { get; private set; }
-        public bool             IsAuthority => _isAuthority;
-        public string           ModeID      => _def != null ? _def.ModeID : "unknown";
+        public IGameModeContext Context                               => _ctx;
+        public bool             IsRunning                            { get; private set; }
+        public bool             IsAuthority                          => _isAuthority;
+        public string           ModeID                               => _def != null ? _def.ModeID : "unknown";
+        public GMF_Config Definition                       => _def;
+        public IReadOnlyDictionary<int,int> RoundWinsPerTeam         => _roundWins;
 
         // ── Lifecycle ─────────────────────────────────────────
 
         private void Awake()
         {
-            // ✅ Instance en Awake (no solo en StartGame)
-            // Flags y zonas usan Instance.Context.Teams desde Start()
             if (Instance == null) Instance = this;
-            else if (Instance != this)
-            {
-                CoreLogger.LogWarning("[GameModeBase] Instancia duplicada detectada.");
-            }
 
             if (_def == null)
             {
@@ -76,7 +73,7 @@ namespace GMF
                 _ruleEngine = new RuleEngine();
                 _ruleEngine.Initialize(_ctx, _def.GetRules());
 
-                _winEval               = new WinConditionEvaluator();
+                _winEval              = new WinConditionEvaluator();
                 _winEval.OnWinDetected = OnWinDetected;
                 _winEval.Initialize(_ctx, _def.GetWinConditions());
             }
@@ -104,14 +101,9 @@ namespace GMF
 
         // ── Team assignment ───────────────────────────────────
 
-        /// <summary>
-        /// Asigna equipo a todos los PlayerAuthority en escena.
-        /// Llamado en StartGame() y desde PlayerTeamAssigner.
-        /// </summary>
         public void AssignAllPlayersToTeams()
         {
             if (_ctx == null) return;
-
             var authorities = FindObjectsByType<Player.Authority.PlayerAuthority>(
                 FindObjectsInactive.Exclude, FindObjectsSortMode.None);
 
@@ -124,45 +116,29 @@ namespace GMF
                     assigned++;
                 }
             }
-
             if (assigned > 0)
-                CoreLogger.LogSystem("GameModeBase", $"{assigned} jugador(es) asignado(s) a equipos.");
+                CoreLogger.LogSystem("GameModeBase", $"{assigned} jugador(es) asignado(s).");
         }
 
         private void OnPlayerReady(PlayerReadyEvent e)
         {
             if (!_isAuthority || _ctx == null) return;
-
-            // ✅ Asignar SIEMPRE, no solo cuando IsRunning
             if (_ctx.Teams.GetTeam(e.PlayerID) < 0)
-            {
                 _ctx._teams.AutoAssign(e.PlayerID);
-                CoreLogger.LogSystemDebug("GameModeBase",
-                    $"P{e.PlayerID} asignado al equipo {_ctx.Teams.GetTeam(e.PlayerID)}");
-            }
         }
 
         // ── API Pública ───────────────────────────────────────
 
         public void StartGame()
         {
-            if (!_isAuthority)
-            {
-                CoreLogger.LogWarning("[GameModeBase] StartGame ignorado: sin autoridad.");
-                return;
-            }
-            if (_def == null)
-            {
-                CoreLogger.LogError("[GameModeBase] StartGame cancelado: _def es null.");
-                return;
-            }
+            if (!_isAuthority) { CoreLogger.LogWarning("[GameModeBase] Sin autoridad."); return; }
+            if (_def == null)  { CoreLogger.LogError("[GameModeBase] _def null."); return; }
             if (IsRunning) return;
 
             Instance  = this;
             IsRunning = true;
             _roundWins.Clear();
 
-            // ✅ Asignar todos los jugadores existentes ANTES de la partida
             AssignAllPlayersToTeams();
 
             CoreLogger.LogSystem("GameModeBase", $"[{ModeID}] StartGame()");
@@ -188,8 +164,7 @@ namespace GMF
 
             _ctx.SetPhase(GameModePhase.PostGame);
 
-            CoreLogger.LogSystem("GameModeBase",
-                $"[{ModeID}] EndGame. Winner=T{winnerTeamID} ({reason})");
+            CoreLogger.LogSystem("GameModeBase", $"[{ModeID}] EndGame T{winnerTeamID} ({reason})");
 
             EventBus<GameEndedEvt>.Raise(new GameEndedEvt
             {
@@ -200,10 +175,7 @@ namespace GMF
             });
 
             EventBus<Core.Events.GameStateChangeRequestedEvent>.Raise(
-                new Core.Events.GameStateChangeRequestedEvent
-                {
-                    TargetState = Core.GameState.GameOver
-                });
+                new Core.Events.GameStateChangeRequestedEvent { TargetState = Core.GameState.GameOver });
         }
 
         public void ResetGame()
@@ -217,8 +189,6 @@ namespace GMF
             _roundWins.Clear();
             _ctx._objectives.ResetAll();
         }
-
-        // ── Registro de objetivos ─────────────────────────────
 
         public void RegisterObjective(IObjective obj)   => _ctx._objectives.Register(obj);
         public void UnregisterObjective(string id)      => _ctx._objectives.Unregister(id);
@@ -248,7 +218,7 @@ namespace GMF
 
         private IEnumerator RoundTimerRoutine()
         {
-            float total   = _def.RoundConfig.RoundDuration;
+            float total = _def.RoundConfig.RoundDuration;
             float elapsed = 0f;
 
             while (elapsed < total)
@@ -269,7 +239,7 @@ namespace GMF
                 var result = _winEval != null
                     ? _winEval.EvaluateTimeOut()
                     : WinResult.Draw;
-                StartRoundEndSequence(result.WinnerTeamID, result.Reason);
+                HandleRoundEnd(result.WinnerTeamID, result.Reason);
             }
         }
 
@@ -277,6 +247,14 @@ namespace GMF
         {
             _ctx.SetPhase(GameModePhase.RoundEnd);
             SetInputEnabled(false);
+
+            // ✅ Acumular victorias del ganador ANTES de emitir el evento
+            //    para que la UI pueda leer el valor actualizado
+            if (winnerTeamID >= 0)
+            {
+                _roundWins.TryGetValue(winnerTeamID, out int w);
+                _roundWins[winnerTeamID] = w + 1;
+            }
 
             EventBus<RoundEndedEvt>.Raise(new RoundEndedEvt
             {
@@ -288,15 +266,14 @@ namespace GMF
 
             yield return new WaitForSeconds(_def.RoundConfig.RoundEndDuration);
 
-            if (winnerTeamID >= 0)
-            {
-                _roundWins.TryGetValue(winnerTeamID, out int w);
-                _roundWins[winnerTeamID] = w + 1;
-            }
-
+            // ✅ Verificar si el ganador alcanzó las rondas necesarias
+            int needed = _def.RoundConfig.RoundsToWinMatch;
             bool matchWon = winnerTeamID >= 0
                 && _roundWins.TryGetValue(winnerTeamID, out int wins)
-                && wins >= _def.RoundConfig.RoundsToWinMatch;
+                && wins >= needed;
+
+            CoreLogger.LogSystem("GameModeBase",
+                $"T{winnerTeamID} rondas: {(winnerTeamID >= 0 && _roundWins.TryGetValue(winnerTeamID, out int dbg) ? dbg : 0)}/{needed} → matchWon={matchWon}");
 
             if (matchWon)
             {
@@ -312,24 +289,20 @@ namespace GMF
             }
         }
 
-        private void StartRoundEndSequence(int winnerTeamID, string reason)
+        private void HandleRoundEnd(int winnerTeamID, string reason)
         {
             if (_phaseCoroutine != null) { StopCoroutine(_phaseCoroutine); _phaseCoroutine = null; }
             _phaseCoroutine = StartCoroutine(RoundEndSequence(winnerTeamID));
         }
 
-        // ── Callbacks ─────────────────────────────────────────
-
         private void OnWinDetected(WinResult result)
         {
             if (_ctx.Phase != GameModePhase.Playing) return;
-            StartRoundEndSequence(result.WinnerTeamID, result.Reason);
+            HandleRoundEnd(result.WinnerTeamID, result.Reason);
         }
 
         private void OnObjectiveReset(ObjectiveResetEvt e)
             => _ctx._objectives.Get(e.ObjectiveID)?.Reset();
-
-        // ── Helpers ───────────────────────────────────────────
 
         private void SetInputEnabled(bool enabled)
         {
