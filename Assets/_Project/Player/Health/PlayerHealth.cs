@@ -163,6 +163,27 @@ namespace Player.Health
             );
         }
 
+        public void SetMaxHealth(float newMax, bool resetCurrent = false)
+        {
+            if (!_authority.HasAuthority) return;
+
+            newMax = Mathf.Max(1f, newMax);
+
+            float prevMax = MaxHealth;
+            MaxHealth = newMax;
+
+            if (resetCurrent)
+            {
+                CurrentHealth = MaxHealth;
+            }
+            else
+            {
+                // Mantener proporción de vida
+                float percent = prevMax > 0f ? CurrentHealth / prevMax : 1f;
+                CurrentHealth = MaxHealth * percent;
+            }
+        }
+
         /// <summary>Restaura la salud al máximo (para respawn).</summary>
         public void ResetHealth()
         {

@@ -3020,6 +3020,54 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1693219965}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &732688677
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 732688679}
+  - component: {fileID: 732688678}
+  m_Layer: 0
+  m_Name: CharacterManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &732688678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 732688677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 035a66db20f44984ea6ca0258cd04b8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterSystem.CharacterSelectionSystem
+  _characters:
+  - {fileID: 11400000, guid: 3e4f8d66e4dae4e4cb6aba4562b02248, type: 2}
+  _persistSelection: 1
+  _defaultCharacterID: Character_1
+--- !u!4 &732688679
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 732688677}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &782014299
 GameObject:
   m_ObjectHideFlags: 0
@@ -4913,6 +4961,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3973712536309430605}
+    - targetCorrespondingSourceObject: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3973712536309430607}
   m_SourcePrefab: {fileID: 100100000, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
 --- !u!143 &3973712536309430572 stripped
 CharacterController:
@@ -5090,6 +5141,20 @@ MonoBehaviour:
   _centerY: 0.5
   _bgAlpha: 0.82
   _hoverScale: 1.25
+--- !u!114 &3973712536309430607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3973712536309430573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc24cb13107a6f647a7f1db49b7a9260, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterSystem.Runtime.CharacterManager
+  _startCharacter: {fileID: 11400000, guid: 3e4f8d66e4dae4e4cb6aba4562b02248, type: 2}
+  _visualRoot: {fileID: 1862889485}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -5101,3 +5166,4 @@ SceneRoots:
   - {fileID: 421648704}
   - {fileID: 906804244}
   - {fileID: 1383373477}
+  - {fileID: 732688679}
