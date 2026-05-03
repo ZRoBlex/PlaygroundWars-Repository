@@ -4939,18 +4939,6 @@ PrefabInstance:
       addedObject: {fileID: 3973712536309430574}
     - targetCorrespondingSourceObject: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3973712536309430589}
-    - targetCorrespondingSourceObject: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3973712536309430588}
-    - targetCorrespondingSourceObject: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3973712536309430587}
-    - targetCorrespondingSourceObject: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3973712536309430586}
-    - targetCorrespondingSourceObject: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 3973712536309430597}
     - targetCorrespondingSourceObject: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
       insertIndex: -1
@@ -4964,6 +4952,18 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3973712536309430607}
+    - targetCorrespondingSourceObject: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3973712536309430611}
+    - targetCorrespondingSourceObject: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3973712536309430610}
+    - targetCorrespondingSourceObject: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3973712536309430609}
+    - targetCorrespondingSourceObject: {fileID: 4420880927218173087, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3973712536309430608}
   m_SourcePrefab: {fileID: 100100000, guid: 71afdd59a195fcc4a8d79d808fec1c16, type: 3}
 --- !u!143 &3973712536309430572 stripped
 CharacterController:
@@ -5025,62 +5025,6 @@ MonoBehaviour:
   _groundMask:
     serializedVersion: 2
     m_Bits: 521
---- !u!114 &3973712536309430586
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3973712536309430573}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 317d4f5793a50e045b040f8dad31866f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Abilities.StatusEffects.StatusEffectManager
---- !u!114 &3973712536309430587
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3973712536309430573}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 001acc1a1ebf77e4e97990621335481d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Abilities.AbilityEffectSystem
-  _slowPrefab: {fileID: 0}
-  _freezePrefab: {fileID: 0}
-  _blindPrefab: {fileID: 0}
---- !u!114 &3973712536309430588
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3973712536309430573}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 636efa960a8824a4586cb37217317f08, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Abilities.AbilityTargetingSystem
-  _playerCamera: {fileID: 799307719}
-  _drawGizmos: 1
---- !u!114 &3973712536309430589
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3973712536309430573}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63f34da13f5b09c44860cf01be1806ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Abilities.AbilityManager
-  _abilities:
-  - {fileID: 0}
-  _useNetworking: 0
 --- !u!114 &3973712536309430597
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5155,6 +5099,58 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSystem.Runtime.CharacterManager
   _startCharacter: {fileID: 11400000, guid: 3e4f8d66e4dae4e4cb6aba4562b02248, type: 2}
   _visualRoot: {fileID: 1862889485}
+--- !u!114 &3973712536309430608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3973712536309430573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4678684ea04b83143813f8c810b89d02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AbilitySystem.StatusEffectManager
+--- !u!114 &3973712536309430609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3973712536309430573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee3704a97ec10a94690df5f7a69b2161, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AbilitySystem.AbilityManager
+  _startAbilities: []
+  _maxSlots: 4
+  _useNetworking: 0
+--- !u!114 &3973712536309430610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3973712536309430573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df9a0cba9c69dfd41af119e661c7cec1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AbilitySystem.AbilityEffectSystem
+--- !u!114 &3973712536309430611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3973712536309430573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 127b63a7fdeff934a80cf6f09d5cf51c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AbilitySystem.AbilityTargetingSystem
+  _camera: {fileID: 799307719}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

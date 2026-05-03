@@ -205,23 +205,23 @@ namespace AbilitySystem
 
     // ── Evento de request de red ──────────────────────────────
 
-    public struct OnAbilityAddedEvt
-    {
-        public int    OwnerID;
-        public string AbilityID;
-        public int    SlotIndex;
-    }
+    // public struct OnAbilityAddedEvt
+    // {
+    //     public int    OwnerID;
+    //     public string AbilityID;
+    //     public int    SlotIndex;
+    // }
 
-    public struct OnAbilityRemovedEvt
-    {
-        public int    OwnerID;
-        public string AbilityID;
-    }
+    // public struct OnAbilityRemovedEvt
+    // {
+    //     public int    OwnerID;
+    //     public string AbilityID;
+    // }
 
-    public struct RequestActivateAbilityEvt
-    {
-        public int    RequesterID;
-        public string AbilityID;
-        public float  Timestamp;
-    }
+    // public struct RequestActivateAbilityEvt
+    // {
+    //     public int    RequesterID;
+    //     public string AbilityID;
+    //     public float  Timestamp;
+    // }
 }

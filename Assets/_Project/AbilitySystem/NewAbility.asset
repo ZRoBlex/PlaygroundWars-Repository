@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea9b5700e2ad6a44fa2ed771a0d049bd, type: 3}
+  m_Name: NewAbility
+  m_EditorClassIdentifier: Assembly-CSharp::AbilitySystem.AbilityConfig
+  AbilityID: ability_id
+  DisplayName: Habilidad
+  Description: 
+  Icon: {fileID: 0}
+  Cooldown: 5
+  TargetType: 0
+  Range: 10
+  AreaRadius: 5
+  HitLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  CanTargetSelf: 1
+  Damage: 0
+  Heal: 0
+  StatusEffectIDs: []
+  StatusEffectPrefabs: []
+  EffectDuration: 3
+  EffectIntensity: 0.5
+  UseNetworking: 0
+  ActivationFX: {fileID: 0}
+  ImpactFX: {fileID: 0}
+  FXDuration: 1
